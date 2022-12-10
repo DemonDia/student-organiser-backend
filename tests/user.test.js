@@ -28,20 +28,20 @@ const request = require("supertest");
 const app = express();
 app.use(express.json());
 app.use("/api/users", require("../Routes/userRoutes"));
-const setUp = async() => {
+const setUp = async () => {
     connect();
-    await resetDb()
+    await resetDb();
     console.log("Ready");
 };
-const cleanUp = async() => {
+const cleanUp = async () => {
     await resetDb();
     console.log("CleanedUp");
 };
-const resetDb = async() => {
+const resetDb = async () => {
     await User.deleteMany();
 };
 
-beforeAll(async() => await setUp());
+beforeAll(async () => await setUp());
 afterAll(async () => await cleanUp());
 
 describe("test user route", () => {
@@ -173,6 +173,81 @@ describe("add user route", () => {
         // check message --> should be defined and message = "Password must be at least 8 characters"
         expect(body.message).toBeDefined();
         expect(body.message).toBe("Password must be at least 8 characters");
+    });
+});
+
+describe("login user", () => {
+    it("User yet to verify", async () => {
+        const mockUser = await request(app).post("/api/users/").send({
+            name: "Karin",
+            email: "karinsan@gmail.com",
+            password: "12345678",
+        });
+        const { body, statusCode } = await request(app)
+            .post("/api/users/login")
+            .send({
+                email: "karinsan@gmail.com",
+                password: "12345678",
+            });
+
+        // check status code
+        expect(statusCode).toBe(200);
+        // check success
+        expect(body.success).toBeFalsy();
+        // check message
+        expect(body.message).toBe("Pleaase verify your account!");
+    });
+
+    // it("Incorrect Password", async () => {
+    //     const mockUser = await request(app).post("/api/users/").send({
+    //         name: "Karin",
+    //         email: "karinsan@gmail.com",
+    //         password: "12345678",
+    //     });
+    //     const { body, statusCode } = await request(app)
+    //         .post("/api/users/login")
+    //         .send({
+    //             email: "karinsan@gmail.com",
+    //             password: "1234567a8",
+    //         });
+
+    //     // check status code
+    //     expect(statusCode).toBe(200);
+    //     // check success
+    //     expect(body.success).toBeFalsy();
+    //     // check message
+    //     expect(body.message).toBe("Invalid password");
+    // });
+
+    it("Blank email", async () => {
+        const { body, statusCode } = await request(app)
+            .post("/api/users/login")
+            .send({
+                email: "",
+                password: "12345678",
+            });
+
+        // check status code
+        expect(statusCode).toBe(200);
+        // check success
+        expect(body.success).toBeFalsy();
+        // check message
+        expect(body.message).toBe("Please fill up all the fields");
+    });
+    it("Blank password", async () => {
+        const { body, statusCode } = await request(app)
+            .post("/api/users/login")
+            .send({
+                email: "karinsan@gmail.com",
+                password: "",
+            });
+
+        // check status code
+        expect(statusCode).toBe(200);
+        // check success
+        expect(body.success).toBeFalsy();
+        // check message
+        expect(body.message).toBe("Please fill up all the fields");
     });
 });
 
