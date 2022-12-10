@@ -1,6 +1,35 @@
-const User = require("../Models/User");
+const User = require("../Models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+
+// ========================JWT========================
+const generateJWT = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: "30d",
+    });
+};
+const verifyToken = async (token) => {
+    console.log(token);
+    if (token) {
+        try {
+            // verify token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            // get user from token
+            currUser = await User.findById(decoded.id).select("-password");
+            if (currUser) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
+    } else {
+        return false;
+    }
+};
 
 const testRoute = async (req, res) => {
     res.send({
@@ -9,6 +38,7 @@ const testRoute = async (req, res) => {
     });
 };
 
+// ========================all users========================
 const getUsers = async (req, res) => {
     await User.find()
         .then((result) => {
@@ -25,6 +55,8 @@ const getUsers = async (req, res) => {
             });
         });
 };
+
+// ========================add user========================
 const addUser = async (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -56,7 +88,7 @@ const addUser = async (req, res) => {
                 });
                 await User.create(newUser)
                     .then(async (result) => {
-                        // const token = generateJWT(newUser._id);
+                        const token = generateJWT(newUser._id);
                         // const content = {
                         //     user: newUser,
                         //     token: token,
@@ -73,7 +105,7 @@ const addUser = async (req, res) => {
                         // );
                         res.send({
                             success: true,
-                            data: newUser._id,
+                            data: token,
                         });
                     })
                     .catch((err) => {
@@ -87,6 +119,8 @@ const addUser = async (req, res) => {
         }
     }
 };
+
+// ========================login userT========================
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -100,7 +134,7 @@ const loginUser = async (req, res) => {
             if (!user.activated) {
                 res.send({
                     success: false,
-                    message: "Pleaase verify your account!"
+                    message: "Pleaase verify your account!",
                 });
             } else {
                 if (await bcrypt.compare(password, user.password)) {
@@ -124,5 +158,71 @@ const loginUser = async (req, res) => {
         }
     }
 };
+// ========================get curr user========================
+const getMe = async (req, res) => {
+    if (!req.user) {
+        res.send({
+            success: false,
+            message: "Invalid user",
+        });
+    } else if (req.user.id.length != 24) {
+        res.send({
+            success: false,
+            message: "Invalid ID",
+        });
+    } else {
+        const { _id, username, email, phoneNumber } = await User.findById(
+            req.user.id
+        );
+        // check token
+        res.send({
+            success: true,
+            id: _id,
+            username,
+            email,
+            phoneNumber,
+        });
+    }
+};
+// ========================verify user========================
+const verifyUser = async (req, res) => {
+    currentUser = await User.findById(req.params.userId);
+    currentToken = req.params.token;
+    validToken = verifyToken(currentToken);
+    if (!validToken) {
+        res.send({
+            success: false,
+            message: "Invalid token",
+        });
+    } else {
+        if (!currentUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            if (!currentUser.activated) {
+                User.updateOne({ _id: currentUser._id }, { activated: true })
+                    .then((result) => {
+                        res.send({
+                            success: true,
+                            message: "User verified",
+                        });
+                    })
+                    .catch((err) => {
+                        res.send({
+                            success: false,
+                            message: err,
+                        });
+                    });
+            } else {
+                res.send({
+                    success: false,
+                    message: "User already verified",
+                });
+            }
+        }
+    }
+};
 
-module.exports = { getUsers, testRoute, addUser, loginUser };
+module.exports = { getUsers, testRoute, addUser, loginUser,getMe ,verifyUser};
