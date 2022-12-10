@@ -21,13 +21,13 @@
 //         expect(a).not.toBeTruthy()
 //     })
 // })
+const { connect } = require("../database");
 const express = require("express");
 const request = require("supertest");
-
 const app = express();
 app.use(express.json());
 app.use("/api/users", require("../Routes/userRoutes"));
-
+connect()
 describe("test user route", () => {
     it("it is working", async () => {
         const { body, statusCode } = await request(app).get("/api/users/test");
@@ -37,24 +37,25 @@ describe("test user route", () => {
     });
 });
 
-describe("Get all users", () => {
-    it("Get all users", async () => {
-        const { body, statusCode } = await request(app).get("/api/users/");
-        console.log(body);
-        expect(body.success).toBeTruthy();
-        expect(body.data).toBeDefined();
-        expect(statusCode).toBe(200);
-    });
-});
-
+// describe("Get all users", () => {
+//     it("Get all users", async () => {
+//         const { body, statusCode } = await request(app).get("/api/users/");
+//         console.log(body);
+//         expect(body.success).toBeTruthy();
+//         expect(body.data).toBeDefined();
+//         expect(statusCode).toBe(200);
+//     });
+// });
 
 describe("add user route", () => {
     it("Successfully add user", async () => {
-        const { body, statusCode } = await request(app).post("/api/users/").send({
-            name:"Siang Meng",
-            email:"sm.lee.2020@smu.edu.sg",
-            password:"12345678"
-        });
+        const { body, statusCode } = await request(app)
+            .post("/api/users/")
+            .send({
+                name: "Siang Meng",
+                email: "sm.lee.2020@smu.edu.sg",
+                password: "12345678",
+            });
         console.log(body);
         // check status code
         expect(statusCode).toBe(200);
@@ -65,91 +66,98 @@ describe("add user route", () => {
     });
 
     it("Existing email", async () => {
-        const { body, statusCode } = await request(app).post("/api/users/").send({
-            name:"Lee Siang Meng",
-            email:"sm.lee.2020@smu.edu.sg",
-            password:"12345678"
-        });
+        const { body, statusCode } = await request(app)
+            .post("/api/users/")
+            .send({
+                name: "Lee Siang Meng",
+                email: "sm.lee.2020@smu.edu.sg",
+                password: "12345678",
+            });
         // check status code
         expect(statusCode).toBe(200);
         // check success
-        expect(body.success).toBeFalsey();
+        expect(body.success).toBeFalsy();
         // check body data --> should not return data
         expect(body.data).not.toBeDefined();
         // check message --> should be defined and message = "Email exists"
         expect(body.message).toBeDefined();
-        expect(body.message).toBe("Email exists");
+        expect(body.message).toBe("User exists");
     });
 
     it("Empty email", async () => {
-        const { body, statusCode } = await request(app).post("/api/users/").send({
-            name:"Lee Siang Meng",
-            email:"",
-            password:"12345678"
-        });
+        const { body, statusCode } = await request(app)
+            .post("/api/users/")
+            .send({
+                name: "Lee Siang Meng",
+                email: "",
+                password: "12345678",
+            });
         // check status code
         expect(statusCode).toBe(200);
         // check success
-        expect(body.success).toBeFalsey();
+        expect(body.success).toBeFalsy();
         // check body data --> should not return data
         expect(body.data).not.toBeDefined();
         // check message --> should be defined and message = "Email cannot be empty"
         expect(body.message).toBeDefined();
-        expect(body.message).toBe("Email cannot be empty");
+        expect(body.message).toBe("Please fill up all fields");
     });
 
     it("Empty name", async () => {
-        const { body, statusCode } = await request(app).post("/api/users/").send({
-            name:"",
-            email:"zzsiangmengzz@gmail.com",
-            password:"12345678"
-        });
+        const { body, statusCode } = await request(app)
+            .post("/api/users/")
+            .send({
+                name: "",
+                email: "zzsiangmengzz@gmail.com",
+                password: "12345678",
+            });
         // check status code
         expect(statusCode).toBe(200);
         // check success
-        expect(body.success).toBeFalsey();
+        expect(body.success).toBeFalsy();
         // check body data --> should not return data
         expect(body.data).not.toBeDefined();
         // check message --> should be defined and message = "Name cannot be empty"
         expect(body.message).toBeDefined();
-        expect(body.message).toBe("Name cannot be empty");
+        expect(body.message).toBe("Please fill up all fields");
     });
 
     it("Empty Password", async () => {
-        const { body, statusCode } = await request(app).post("/api/users/").send({
-            name:"Siang Meng",
-            email:"zzisangmengzz@gmail.com",
-            password:""
-        });
+        const { body, statusCode } = await request(app)
+            .post("/api/users/")
+            .send({
+                name: "Siang Meng",
+                email: "zzisangmengzz@gmail.com",
+                password: "",
+            });
         // check status code
         expect(statusCode).toBe(200);
         // check success
-        expect(body.success).toBeFalsey();
+        expect(body.success).toBeFalsy();
         // check body data --> should not return data
         expect(body.data).not.toBeDefined();
         // check message --> should be defined and message = "Password must be at least 8 characters"
         expect(body.message).toBeDefined();
-        expect(body.message).toBe("Password must be at least 8 characters");
+        expect(body.message).toBe("Please fill up all fields");
     });
     it("7 character password (need 8 char)", async () => {
-        const { body, statusCode } = await request(app).post("/api/users/").send({
-            name:"Siang Meng",
-            email:"zzisangmengzz@gmail.com",
-            password:"1234567"
-        });
+        const { body, statusCode } = await request(app)
+            .post("/api/users/")
+            .send({
+                name: "Siang Meng",
+                email: "zzisangmengzz@gmail.com",
+                password: "1234567",
+            });
         // check status code
         expect(statusCode).toBe(200);
         // check success
-        expect(body.success).toBeFalsey();
+        expect(body.success).toBeFalsy();
         // check body data --> should not return data
         expect(body.data).not.toBeDefined();
         // check message --> should be defined and message = "Password must be at least 8 characters"
         expect(body.message).toBeDefined();
         expect(body.message).toBe("Password must be at least 8 characters");
     });
-
 });
 
-describe("change password",()=>{
-
-})
+describe("change password", () => {});
