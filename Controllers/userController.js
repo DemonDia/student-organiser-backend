@@ -24,10 +24,6 @@ const getUsers = async (req, res) => {
                 message: err,
             });
         });
-    res.send({
-        success: true,
-        data: [],
-    });
 };
 const addUser = async (req, res) => {
     const { name, email, password } = req.body;

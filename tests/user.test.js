@@ -21,13 +21,29 @@
 //         expect(a).not.toBeTruthy()
 //     })
 // })
+const User = require("../Models/User");
 const { connect } = require("../database");
 const express = require("express");
 const request = require("supertest");
 const app = express();
 app.use(express.json());
 app.use("/api/users", require("../Routes/userRoutes"));
-connect()
+const setUp = async() => {
+    connect();
+    await resetDb()
+    console.log("Ready");
+};
+const cleanUp = async() => {
+    await resetDb();
+    console.log("CleanedUp");
+};
+const resetDb = async() => {
+    await User.deleteMany();
+};
+
+beforeAll(async() => await setUp());
+afterAll(async () => await cleanUp());
+
 describe("test user route", () => {
     it("it is working", async () => {
         const { body, statusCode } = await request(app).get("/api/users/test");
@@ -37,15 +53,15 @@ describe("test user route", () => {
     });
 });
 
-// describe("Get all users", () => {
-//     it("Get all users", async () => {
-//         const { body, statusCode } = await request(app).get("/api/users/");
-//         console.log(body);
-//         expect(body.success).toBeTruthy();
-//         expect(body.data).toBeDefined();
-//         expect(statusCode).toBe(200);
-//     });
-// });
+describe("Get all users", () => {
+    it("Get all users", async () => {
+        const { body, statusCode } = await request(app).get("/api/users/");
+        console.log(body);
+        expect(body.success).toBeTruthy();
+        expect(body.data).toBeDefined();
+        expect(statusCode).toBe(200);
+    });
+});
 
 describe("add user route", () => {
     it("Successfully add user", async () => {
