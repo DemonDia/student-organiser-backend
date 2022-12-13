@@ -198,11 +198,10 @@ const updateEvent = async (req, res) => {
                     await Event.findOne({
                         _id: { $ne: eventId },
                         userId: userId,
-                        isoDate
+                        isoDate,
                     })
                         .then((clashingEvent) => {
                             if (!clashingEvent) {
-                            
                                 Event.updateOne(
                                     { _id: result._id },
                                     {
@@ -244,9 +243,49 @@ const updateEvent = async (req, res) => {
 };
 
 // ========================delete event========================
-// check if event exists
-// check if user ID matches
-const deleteEvent = async (req, res) => {};
+// check if event exists --> done
+// check if user ID matches --> done
+const deleteEvent = async (req, res) => {
+    const {eventId} = req.params;
+    const {userId} = req.body
+    if (eventId.length != 24) {
+        res.send({
+            success: false,
+            message: "Event does not exist!",
+        });
+    } else {
+        await Event.findById(eventId).then((result) => {
+            if (!result) {
+                res.send({
+                    success: false,
+                    message: "Event does not exist!",
+                });
+            } else {
+                if (result.userId != userId) {
+                    res.send({
+                        success: false,
+                        message: "User does not have that Event",
+                    });
+                } else {
+                    Event.deleteOne(result)
+                        .then((deleteResult) => {
+                            res.send({
+                                success: true,
+                                message: "Event deleted",
+                            });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            res.send({
+                                success: false,
+                                message: err,
+                            });
+                        });
+                }
+            }
+        });
+    }
+};
 module.exports = {
     getEvents,
     getAllUserEvents,
