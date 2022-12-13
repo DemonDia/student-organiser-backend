@@ -101,6 +101,60 @@ const getMonthYearUserEvents = async (req, res) => {
     }
 };
 
+// ========================all events of user with specific day & month & year========================
+const getDayMonthYearUserEvents = async (req, res) => {
+    const {
+        userId,
+        year: filterYear,
+        month: filterMonth,
+        day: filterDay,
+    } = req.params;
+    if (userId.length != 24) {
+        res.send({
+            success: false,
+            message: "User does not exist",
+        });
+    } else {
+        const getUser = await User.findOne({ _id: userId });
+        if (!getUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            filteredEvents = [];
+            await Event.find({ userId: userId })
+                .then((result) => {
+                    result.forEach((userEvent) => {
+                        const {
+                            year: eventYear,
+                            month: eventMonth,
+                            day: eventDay,
+                        } = userEvent.date;
+                        if (
+                            eventYear == filterYear &&
+                            eventMonth == filterMonth &&
+                            eventDay == filterDay
+                        ) {
+                            filteredEvents.push(userEvent);
+                        }
+                    });
+                    res.send({
+                        success: true,
+                        data: filteredEvents,
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.send({
+                        success: false,
+                        message: err,
+                    });
+                });
+        }
+    }
+};
+
 // ========================add event========================
 // check if event clashes (same year, month, day and time) --> done
 // event name cannot exceed 20 char --> done
@@ -246,8 +300,8 @@ const updateEvent = async (req, res) => {
 // check if event exists --> done
 // check if user ID matches --> done
 const deleteEvent = async (req, res) => {
-    const {eventId} = req.params;
-    const {userId} = req.body
+    const { eventId } = req.params;
+    const { userId } = req.body;
     if (eventId.length != 24) {
         res.send({
             success: false,
@@ -289,6 +343,7 @@ const deleteEvent = async (req, res) => {
 module.exports = {
     getEvents,
     getAllUserEvents,
+    getDayMonthYearUserEvents,
     getMonthYearUserEvents,
     addEvent,
     updateEvent,
