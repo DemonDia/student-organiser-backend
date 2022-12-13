@@ -19,6 +19,38 @@ const getEvents = async (req, res) => {
         });
 };
 
+// ========================get event by id========================
+const getEventById = async(req,res)=>{
+    const {eventId} = req.params;
+    if (eventId.length != 24) {
+        res.send({
+            success: false,
+            message: "Event is not found",
+        });
+    } else {
+        await Event.findById(eventId)
+            .then((result) => {
+                if (!result) {
+                    res.send({
+                        success: false,
+                        message: "Event is not found",
+                    });
+                } else {
+                    res.send({
+                        success: true,
+                        data: result,
+                    });
+                }
+            })
+            .catch((err) => {
+                res.send({
+                    success: false,
+                    message: err,
+                });
+            });
+    }
+}
+
 // ========================all events of user========================
 // get the user ID
 const getAllUserEvents = async (req, res) => {
@@ -348,4 +380,5 @@ module.exports = {
     addEvent,
     updateEvent,
     deleteEvent,
+    getEventById
 };

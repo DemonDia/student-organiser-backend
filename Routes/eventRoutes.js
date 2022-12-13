@@ -6,11 +6,13 @@ const {
     addEvent,
     updateEvent,
     deleteEvent,
+    getEventById
 } = require("../Controllers/eventController");
 const express = require("express");
 const router = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 router.get("/", getEvents);
+router.get("/id/:eventId", protect, getEventById);
 router.get("/:userId", protect, getAllUserEvents);
 router.get("/:year/:month/:userId", protect, getMonthYearUserEvents);
 router.get("/:year/:month/:day/:userId", protect, getDayMonthYearUserEvents);
