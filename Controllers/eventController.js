@@ -59,9 +59,68 @@ const getAllUserEvents = async (req, res) => {
 const getMonthYearUserEvents = async (req, res) => {};
 
 // ========================add event========================
-// check if event clashes (same year, month, day and time)
-// event name cannot exceed 20 char
-const addEvent = async (req, res) => {};
+// check if event clashes (same year, month, day and time) --> done
+// event name cannot exceed 20 char --> done
+const addEvent = async (req, res) => {
+    const userId = req.body.userId;
+    if (userId.length != 24) {
+        res.send({
+            success: false,
+            message: "User does not exist",
+        });
+    } else {
+        const getUser = await User.findOne({ _id: userId });
+        if (!getUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            const { eventName, tags, date } = req.body;
+            const { year, month, day, hour, minute } = date;
+            const newEvent = new Event({
+                userId,
+                eventName,
+                tags,
+                date,
+                isoDate: new Date(year, month, day, hour, minute),
+            });
+            // get all events of user --> filter
+            const getClashingEvents = await Event.findOne({
+                userId: newEvent.userId,
+                isoDate: newEvent.isoDate,
+            });
+            if (eventName.length > 20) {
+                res.send({
+                    success: false,
+                    message: "Event name cannot exceed 20 characters",
+                });
+            } else {
+                if (getClashingEvents) {
+                    res.send({
+                        success: false,
+                        message: "There is a clashing event",
+                    });
+                } else {
+                    await Event.create(newEvent)
+                        .then((result) => {
+                            res.send({
+                                success: true,
+                                message: "Event added",
+                                data: newEvent._id,
+                            });
+                        })
+                        .catch((err) => {
+                            res.send({
+                                success: false,
+                                message: err,
+                            });
+                        });
+                }
+            }
+        }
+    }
+};
 
 // ========================update event========================
 // check if event clashes (same year, month, day and time)

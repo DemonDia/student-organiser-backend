@@ -21,7 +21,8 @@ const eventSchema = mongoose.Schema({
             //     year:2022,
             //     month:11,
             //     day:1,
-            //     time:"10:30"
+            //     hour:
+            //     minute:
             // }
     },
     isoDate:{
