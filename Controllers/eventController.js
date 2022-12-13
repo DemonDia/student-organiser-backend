@@ -21,7 +21,37 @@ const getEvents = async (req, res) => {
 
 // ========================all events of user========================
 // get the user ID
-const getAllUserEvents = async (req, res) => {};
+const getAllUserEvents = async (req, res) => {
+    userId = req.params.userId;
+    if (userId.length != 24) {
+        res.send({
+            success: false,
+            message: "User does not exist",
+        });
+    } else {
+        const getUser = await User.findOne({ _id: userId });
+        if (!getUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            await Event.find({ userId: userId })
+                .then((result) => {
+                    res.send({
+                        success: true,
+                        data: result,
+                    });
+                })
+                .catch((err) => {
+                    res.send({
+                        success: false,
+                        message: err,
+                    });
+                });
+        }
+    }
+};
 
 // ========================all events of user with specific month & year========================
 // get the user ID first
