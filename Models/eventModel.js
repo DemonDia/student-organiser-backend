@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const eventSchema = mongoose.Schema({
+    userId:{
+        type: String,
+        required: [true, "Please add a user"],
+    },
     eventName: {
         type: String,
         required: [true, "Please add a name"],
