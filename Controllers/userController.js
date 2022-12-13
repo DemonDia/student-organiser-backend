@@ -9,7 +9,6 @@ const generateJWT = (id) => {
     });
 };
 const verifyToken = async (token) => {
-    console.log(token);
     if (token) {
         try {
             // verify token
