@@ -10,6 +10,8 @@ const {connect} = require("./database")
 
 // ==============routes==============
 app.use("/api/users",require("./Routes/userRoutes"))
+app.use("/api/events",require("./Routes/eventRoutes"))
+
 const PORT = 8000
 
 connect()
