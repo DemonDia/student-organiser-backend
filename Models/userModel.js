@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const eventSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
     name: {
         type: String,
         required: [true, "Please add a name"],
@@ -18,4 +18,4 @@ const eventSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model("Event", eventSchema);
+module.exports = mongoose.model("User", userSchema);

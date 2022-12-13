@@ -2,7 +2,22 @@ const User = require("../Models/userModel");
 const Event = require("../Models/eventModel");
 
 // ========================all events on db========================
-const getEvents = async (req, res) => {};
+const getEvents = async (req, res) => {
+    await Event.find()
+        .then((result) => {
+            res.send({
+                success: true,
+                data: result,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.send({
+                success: false,
+                message: err,
+            });
+        });
+};
 
 // ========================all events of user========================
 // get the user ID
