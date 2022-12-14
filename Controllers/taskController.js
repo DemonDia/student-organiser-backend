@@ -13,8 +13,9 @@ const Task = require("../Models/taskModel");
 // addedIsoDate --> datetime object --> created based on addedDate object
 
 // =============Create=============
-// add to db
+// add to db 
 // dont need to worry about clashing
+// done
 const addTask = async (req, res) => {
     const userId = req.body.userId;
     if (userId.length != 24) {
@@ -66,6 +67,7 @@ const addTask = async (req, res) => {
 };
 // =============Read=============
 // get all from db
+// done
 const getTasks = async (req, res) => {
     await Task.find()
         .then((result) => {
