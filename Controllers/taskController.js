@@ -13,7 +13,7 @@ const Task = require("../Models/taskModel");
 // addedIsoDate --> datetime object --> created based on addedDate object
 
 // =============Create=============
-// add to db 
+// add to db
 // dont need to worry about clashing
 // done
 const addTask = async (req, res) => {
@@ -38,7 +38,7 @@ const addTask = async (req, res) => {
                 taskName,
                 tags,
                 addedDate,
-                completed:false,
+                completed: false,
                 addedIsoDate: new Date(year, month, day),
             });
             if (taskName.length > 20) {
@@ -120,6 +120,7 @@ const getAllUserTasks = async (req, res) => {
 };
 
 // get for specific day for given user
+// done
 const getDayMonthYearUserTasks = async (req, res) => {
     const {
         userId,
@@ -174,7 +175,52 @@ const getDayMonthYearUserTasks = async (req, res) => {
 };
 // =============Edit=============
 // edit task name
-const updateTask = async (req, res) => {};
+const updateTask = async (req, res) => {
+    const { userId, tags, taskName } = req.body;
+    const { taskId } = req.params;
+    await Task.findById(taskId).then(async (result) => {
+        if (!result) {
+            res.send({
+                success: false,
+                message: "Task does not exist!",
+            });
+        } else {
+            if (result.userId != userId) {
+                res.send({
+                    success: false,
+                    message: "User does not have that Task",
+                });
+            } else {
+                if (taskName.length > 20) {
+                    res.send({
+                        success: false,
+                        message: "Task name cannot exceed 20 characters",
+                    });
+                } else {
+                    Task.updateOne(
+                        { _id: result._id },
+                        {
+                            taskName,
+                            tags,
+                        }
+                    )
+                        .then((result) => {
+                            res.send({
+                                success: true,
+                                message: "Task updated",
+                            });
+                        })
+                        .catch((err) => {
+                            res.send({
+                                success: false,
+                                message: err,
+                            });
+                        });
+                }
+            }
+        }
+    });
+};
 // edit task completion status (complete or not)
 const updateTaskCompletion = async (req, res) => {};
 
