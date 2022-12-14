@@ -175,6 +175,7 @@ const getDayMonthYearUserTasks = async (req, res) => {
 };
 // =============Edit=============
 // edit task name
+// done
 const updateTask = async (req, res) => {
     const { userId, tags, taskName } = req.body;
     const { taskId } = req.params;
@@ -221,8 +222,46 @@ const updateTask = async (req, res) => {
         }
     });
 };
-// edit task completion status (complete or not)
-const updateTaskCompletion = async (req, res) => {};
+// edit task completion status (complete or not) --> ONLY completion status
+// done
+const updateTaskCompletion = async (req, res) => {
+    const { userId, completed } = req.body;
+    const { taskId } = req.params;
+    await Task.findById(taskId).then(async (result) => {
+        if (!result) {
+            res.send({
+                success: false,
+                message: "Task does not exist!",
+            });
+        } else {
+            if (result.userId != userId) {
+                res.send({
+                    success: false,
+                    message: "User does not have that Task",
+                });
+            } else {
+                Task.updateOne(
+                    { _id: result._id },
+                    {
+                        completed,
+                    }
+                )
+                    .then((result) => {
+                        res.send({
+                            success: true,
+                            message: "Task status updated",
+                        });
+                    })
+                    .catch((err) => {
+                        res.send({
+                            success: false,
+                            message: err,
+                        });
+                    });
+            }
+        }
+    });
+};
 
 // =============Delete=============
 // delete
