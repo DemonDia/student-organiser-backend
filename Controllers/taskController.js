@@ -17,7 +17,22 @@ const Task = require("../Models/taskModel");
 const addTask = async (req, res) => {};
 // =============Read=============
 // get all from db
-const getTasks = async (req, res) => {};
+const getTasks = async (req, res) => {
+    await Task.find()
+    .then((result) => {
+        res.send({
+            success: true,
+            data: result,
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+        res.send({
+            success: false,
+            message: err,
+        });
+    });
+};
 
 // get all of a given user's db
 const getAllUserTasks = async (req, res) => {};
