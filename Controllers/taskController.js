@@ -1,5 +1,17 @@
 const User = require("../Models/userModel");
 const Task = require("../Models/taskModel");
+// =================task schema=================
+// userId --> belongs to specific user
+// tasName --> belongs to user
+// completed --> boolean; task is completed or not (default is false)
+// tags --> tags involved in the controller?
+// addedDate --> date object contains the following:
+    // year
+    // month
+    // day
+    // time
+// addedIsoDate --> datetime object --> created based on addedDate object
+
 // =============Create=============
 // add to db
 const addTask = async (req, res) => {};
@@ -13,8 +25,10 @@ const getAllUserTasks = async (req, res) => {};
 // get for specific day for given user
 const getDayMonthYearUserTasks = async (req, res) => {};
 // =============Edit=============
-// edit
+// edit task name
 const updateTask = async (req, res) => {};
+// edit task completion status (complete or not)
+const updateTaskCompletion = async (req, res) => {};
 
 // =============Delete=============
 // delete
@@ -25,5 +39,6 @@ module.exports = {
     getAllUserTasks,
     getDayMonthYearUserTasks,
     updateTask,
+    updateTaskCompletion,
     deleteTask,
 };

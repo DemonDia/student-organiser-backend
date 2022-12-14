@@ -258,7 +258,6 @@ const addEvent = async (req, res) => {
 const updateEvent = async (req, res) => {
     const { userId, eventName, tags, date } = req.body;
     const { eventId } = req.params;
-    console.log(eventId);
     await Event.findById(eventId).then(async (result) => {
         if (!result) {
             res.send({
