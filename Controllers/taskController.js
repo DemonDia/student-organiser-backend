@@ -86,7 +86,37 @@ const getTasks = async (req, res) => {
 };
 
 // get all of a given user's db
-const getAllUserTasks = async (req, res) => {};
+const getAllUserTasks = async (req, res) => {
+    userId = req.params.userId;
+    if (userId.length != 24) {
+        res.send({
+            success: false,
+            message: "User does not exist",
+        });
+    } else {
+        const getUser = await User.findOne({ _id: userId });
+        if (!getUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            await Task.find({ userId: userId })
+                .then((result) => {
+                    res.send({
+                        success: true,
+                        data: result,
+                    });
+                })
+                .catch((err) => {
+                    res.send({
+                        success: false,
+                        message: err,
+                    });
+                });
+        }
+    }
+};
 
 // get for specific day for given user
 const getDayMonthYearUserTasks = async (req, res) => {};
