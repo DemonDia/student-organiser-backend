@@ -86,6 +86,7 @@ const getTasks = async (req, res) => {
 };
 
 // get all of a given user's db
+// done
 const getAllUserTasks = async (req, res) => {
     userId = req.params.userId;
     if (userId.length != 24) {
@@ -119,7 +120,58 @@ const getAllUserTasks = async (req, res) => {
 };
 
 // get for specific day for given user
-const getDayMonthYearUserTasks = async (req, res) => {};
+const getDayMonthYearUserTasks = async (req, res) => {
+    const {
+        userId,
+        year: filterYear,
+        month: filterMonth,
+        day: filterDay,
+    } = req.params;
+    if (userId.length != 24) {
+        res.send({
+            success: false,
+            message: "User does not exist",
+        });
+    } else {
+        const getUser = await User.findOne({ _id: userId });
+        if (!getUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            filteredTasks = [];
+            await Task.find({ userId: userId })
+                .then((result) => {
+                    result.forEach((userTask) => {
+                        const {
+                            year: taskYear,
+                            month: taskMonth,
+                            day: taskDay,
+                        } = userTask.addedDate;
+                        if (
+                            taskYear == filterYear &&
+                            taskMonth == filterMonth &&
+                            taskDay == filterDay
+                        ) {
+                            filteredTasks.push(userTask);
+                        }
+                    });
+                    res.send({
+                        success: true,
+                        data: filteredTasks,
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.send({
+                        success: false,
+                        message: err,
+                    });
+                });
+        }
+    }
+};
 // =============Edit=============
 // edit task name
 const updateTask = async (req, res) => {};
