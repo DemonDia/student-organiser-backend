@@ -265,7 +265,49 @@ const updateTaskCompletion = async (req, res) => {
 
 // =============Delete=============
 // delete
-const deleteTask = async (req, res) => {};
+// check if task exists
+// check if userID matches
+const deleteTask = async (req, res) => {
+    const { taskId } = req.params;
+    const { userId } = req.body;
+    if (taskId.length != 24) {
+        res.send({
+            success: false,
+            message: "Task does not exist!",
+        });
+    } else {
+        await Task.findById(taskId).then((result) => {
+            if (!result) {
+                res.send({
+                    success: false,
+                    message: "Task does not exist!",
+                });
+            } else {
+                if (result.userId != userId) {
+                    res.send({
+                        success: false,
+                        message: "User does not have that Task",
+                    });
+                } else {
+                    Task.deleteOne(result)
+                        .then((deleteResult) => {
+                            res.send({
+                                success: true,
+                                message: "Task deleted",
+                            });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            res.send({
+                                success: false,
+                                message: err,
+                            });
+                        });
+                }
+            }
+        });
+    }
+};
 module.exports = {
     addTask,
     getTasks,
