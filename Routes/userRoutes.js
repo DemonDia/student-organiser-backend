@@ -8,7 +8,7 @@ const {
 } = require("../Controllers/userController");
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../Middleware/authMiddleware");
 router.get("/test", testRoute);
 router.get("/", getUsers);
 router.post("/", addUser);

@@ -10,7 +10,7 @@ const {
 } = require("../Controllers/eventController");
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../Middleware/authMiddleware");
 router.get("/", getEvents);
 router.get("/id/:eventId", protect, getEventById);
 router.get("/:userId", protect, getAllUserEvents);

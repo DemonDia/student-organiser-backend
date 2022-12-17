@@ -9,7 +9,7 @@ const {
 } = require("../Controllers/taskController");
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../Middleware/authMiddleware");
 router.get("/",getTasks);
 router.get("/:userId",protect,getAllUserTasks)
 router.get("/:year/:month/:day/:userId",protect,getDayMonthYearUserTasks)
