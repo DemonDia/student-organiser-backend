@@ -5,6 +5,8 @@ const {
     loginUser,
     getMe,
     verifyUser,
+    sendForgetPasswordEmail,
+    changeNewPassword,
 } = require("../Controllers/userController");
 const express = require("express");
 const router = express.Router();
@@ -15,4 +17,6 @@ router.post("/", addUser);
 router.post("/login", loginUser);
 router.get("/me", protect, getMe);
 router.put("/verify/:userId/:token", verifyUser);
+router.put("/resetpass", sendForgetPasswordEmail);
+router.post("/changepass",changeNewPassword);
 module.exports = router;

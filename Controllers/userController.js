@@ -1,7 +1,7 @@
 const User = require("../Models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const {sendEmail} = require("../HelperFunctions")
+const { sendEmail } = require("../HelperFunctions");
 // ========================JWT========================
 const generateJWT = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -97,12 +97,11 @@ const addUser = async (req, res) => {
                             (result) => {
                                 res.send({
                                     success: true,
-                                    data:newUser._id,
+                                    data: newUser._id,
                                     message: "Registration successful",
                                 });
                             }
                         );
-
                     })
                     .catch((err) => {
                         console.log(err);
@@ -220,5 +219,104 @@ const verifyUser = async (req, res) => {
         }
     }
 };
+// ========================send forget email password========================
+const sendForgetPasswordEmail = async (req, res) => {
+    const userEmail = req.body.email;
+    await User.findOne({ email: userEmail })
+        .then(async (result) => {
+            if (result) {
+                token = await generateJWT(result._id);
+                if (result.activated) {
+                    const content = {
+                        user: result,
+                        token: token,
+                        recipient: result.email,
+                    };
+                    console.log("user", result);
+                    await sendEmail("forgotPassword", content)
+                        .then((result) => {
+                            res.send({
+                                success: true,
+                                message: "Email sent",
+                            });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            res.send({
+                                success: true,
+                                message: "",
+                            });
+                        });
+                } else {
+                    res.send({
+                        success: true,
+                        message: "",
+                    });
+                }
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            res.send({
+                success: true,
+                message: "",
+            });
+        });
+};
+// ========================resets the password========================
+const changeNewPassword = async (req, res) => {
+    const { newPassword, token, userId } = req.body;
+    validToken = verifyToken(token);
+    if (!validToken) {
+        res.send({
+            success: false,
+            message: "Invalid token",
+        });
+    } else {
+        currentUser = await User.findById(userId);
+        if (!currentUser) {
+            res.send({
+                success: false,
+                message: "Invalid user",
+            });
+        } else {
+            if (newPassword.length < 8) {
+                res.send({
+                    success: false,
+                    message: "Password must be at least 8 characters!",
+                });
+            } else {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(newPassword, salt);
+                await User.updateOne(
+                    { _id: currentUser._id },
+                    { password: hashedPassword }
+                )
+                    .then((result) => {
+                        res.send({
+                            success: true,
+                            message: "Password reset!",
+                        });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.send({
+                            success: false,
+                            message: err,
+                        });
+                    });
+            }
+        }
+    }
+};
 
-module.exports = { getUsers, testRoute, addUser, loginUser,getMe ,verifyUser};
+module.exports = {
+    getUsers,
+    testRoute,
+    addUser,
+    loginUser,
+    getMe,
+    verifyUser,
+    sendForgetPasswordEmail,
+    changeNewPassword,
+};
