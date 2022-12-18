@@ -13,6 +13,7 @@ app.use("/api/users",require("./Routes/userRoutes"))
 app.use("/api/events",require("./Routes/eventRoutes"))
 app.use("/api/tasks",require("./Routes/taskRoutes"))
 app.use("/api/journals",require("./Routes/journalRoutes"))
+app.use("/api/quizzes",require("./Routes/quizRoutes"))
 const PORT = 8000
 
 connect()
