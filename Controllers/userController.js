@@ -1,7 +1,7 @@
 const User = require("../Models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-
+const {sendEmail} = require("../HelperFunctions")
 // ========================JWT========================
 const generateJWT = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -88,24 +88,21 @@ const addUser = async (req, res) => {
                 await User.create(newUser)
                     .then(async (result) => {
                         const token = generateJWT(newUser._id);
-                        // const content = {
-                        //     user: newUser,
-                        //     token: token,
-                        //     recipient: email,
-                        // };
-                        // await sendEmail("verificationEmail", content).then(
-                        //     (result) => {
-                        //         res.send({
-                        //             success: true,
-                        //             data:newUser._id,
-                        //             message: "Registration successful",
-                        //         });
-                        //     }
-                        // );
-                        res.send({
-                            success: true,
-                            data: token,
-                        });
+                        const content = {
+                            user: newUser,
+                            token: token,
+                            recipient: email,
+                        };
+                        await sendEmail("verificationEmail", content).then(
+                            (result) => {
+                                res.send({
+                                    success: true,
+                                    data:newUser._id,
+                                    message: "Registration successful",
+                                });
+                            }
+                        );
+
                     })
                     .catch((err) => {
                         console.log(err);
@@ -119,7 +116,7 @@ const addUser = async (req, res) => {
     }
 };
 
-// ========================login userT========================
+// ========================login user========================
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
