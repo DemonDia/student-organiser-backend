@@ -17,23 +17,145 @@ const Quiz = require("../Models/quizModel");
 // ========================Create========================
 // check if userId is valid
 // quiz name cannot exceed 30 characters
-// there must be at least 1 question
-const addQuiz = async (req, res) => {};
+// there must be at least 1 question (frontend handles this)
+// done
+const addQuiz = async (req, res) => {
+    const userId = req.body.userId;
+    if (userId.length != 24) {
+        res.send({
+            success: false,
+            message: "User does not exist",
+        });
+    } else {
+        const getUser = await User.findOne({ _id: userId });
+        if (!getUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            const { quizName, questions } = req.body;
+            const newQuiz = new Quiz({
+                userId,
+                quizName,
+                questions,
+            });
+
+            if (quizName.length > 20) {
+                res.send({
+                    success: false,
+                    message: "Quiz name cannot exceed 30 characters",
+                });
+            } else {
+                await Quiz.create(newQuiz)
+                    .then((result) => {
+                        res.send({
+                            success: true,
+                            message: "Quiz entry added",
+                            data: newQuiz._id,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.send({
+                            success: false,
+                            message: err,
+                        });
+                    });
+            }
+        }
+    }
+};
 
 // ========================Read========================
 // =============get all quizzes on db=============
-const getQuizzes = async (req, res) => {};
+// done
+const getQuizzes = async (req, res) => {
+    await Quiz.find()
+        .then((result) => {
+            res.send({
+                success: true,
+                data: result,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.send({
+                success: false,
+                message: err,
+            });
+        });
+};
 
 // =============get all user quizzes=============
 // check if userId is valid
 // check for quizzes with matching userId
-const getUserQuizzes = async (req, res) => {};
+// done
+const getUserQuizzes = async (req, res) => {
+    userId = req.params.userId;
+    if (userId.length != 24) {
+        res.send({
+            success: false,
+            message: "User does not exist",
+        });
+    } else {
+        const getUser = await User.findOne({ _id: userId });
+        if (!getUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            await Quiz.find({ userId: userId })
+                .then((result) => {
+                    res.send({
+                        success: true,
+                        data: result,
+                    });
+                })
+                .catch((err) => {
+                    res.send({
+                        success: false,
+                        message: err,
+                    });
+                });
+        }
+    }
+};
 
 // =============get quiz by Id=============
 // check if quizId is valid
-// check if userId is valid
-// check if userId of quiz and current user matches
-const getQuizById = async (req, res) => {};
+// done
+const getQuizById = async (req, res) => {
+    const { quizId } = req.params;
+    if (quizId.length != 24) {
+        res.send({
+            success: false,
+            message: "Quiz is not found",
+        });
+    } else {
+        await Quiz.findById(quizId)
+            .then((result) => {
+                if (!result) {
+                    res.send({
+                        success: false,
+                        message: "Quiz is not found",
+                    });
+                } else {
+                    res.send({
+                        success: true,
+                        data: result,
+                    });
+                }
+            })
+            .catch((err) => {
+                res.send({
+                    success: false,
+                    message: err,
+                });
+            });
+    }
+};
 
 // ========================Update========================
 // =============update quiz=============
@@ -41,15 +163,108 @@ const getQuizById = async (req, res) => {};
 // check if userId is valid
 // check if userId of quiz and current user matches
 // quiz name cannot exceed 30 characters
-// there must be at least 1 question
-const updateQuiz = async (req, res) => {};
+// there must be at least 1 question (frontend handles this)
+// done
+const updateQuiz = async (req, res) => {
+    const { userId, quizName, questions } = req.body;
+    const { quizId } = req.params;
+    if (quizId.length != 24) {
+        res.send({
+            success: false,
+            message: "Quiz does not exist",
+        });
+    } else {
+        await Quiz.findById(quizId).then(async (result) => {
+            if (!result) {
+                res.send({
+                    success: false,
+                    message: "Quiz does not exist!",
+                });
+            } else {
+                if (result.userId != userId) {
+                    res.send({
+                        success: false,
+                        message: "User does not have that quiz",
+                    });
+                } else {
+                    if (quizName.length > 20) {
+                        res.send({
+                            success: false,
+                            message: "Quiz name cannot exceed 30 characters",
+                        });
+                    } else {
+                        Quiz.updateOne(
+                            { _id: result._id },
+                            {
+                                quizName,
+                                questions,
+                            }
+                        )
+                            .then((result) => {
+                                res.send({
+                                    success: true,
+                                    message: "Quiz updated",
+                                });
+                            })
+                            .catch((err) => {
+                                res.send({
+                                    success: false,
+                                    message: err,
+                                });
+                            });
+                    }
+                }
+            }
+        });
+    }
+};
 
 // ========================Delete========================
 // =============delete quiz=============
 // check if quizId is valid
 // check if userId is valid
 // check if userId of quiz and current user matches
-const deleteQuiz = async (req, res) => {};
+const deleteQuiz = async (req, res) => {
+    const { quizId } = req.params;
+    const { userId } = req.body;
+    if (quizId.length != 24) {
+        res.send({
+            success: false,
+            message: "Quiz does not exist!",
+        });
+    } else {
+        await Quiz.findById(quizId).then((result) => {
+            if (!result) {
+                res.send({
+                    success: false,
+                    message: "Quiz does not exist!",
+                });
+            } else {
+                if (result.userId != userId) {
+                    res.send({
+                        success: false,
+                        message: "User does not have that quiz",
+                    });
+                } else {
+                    Quiz.deleteOne(result)
+                        .then((deleteResult) => {
+                            res.send({
+                                success: true,
+                                message: "Quiz deleted",
+                            });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            res.send({
+                                success: false,
+                                message: err,
+                            });
+                        });
+                }
+            }
+        });
+    }
+};
 
 module.exports = {
     addQuiz,
