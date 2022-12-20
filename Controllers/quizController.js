@@ -7,12 +7,12 @@ const Quiz = require("../Models/quizModel");
 
 // ========================question schema (inside quiz)========================
 // question --> string; what is the question? (max 130 char)
-// correctAnswer --> string; correct answer for the qn
+// correctAnswer --> string; correct answer for the qn (max 130 char)
 // questionType --> Number
 // 1 is open-ended
 // 2 is mcq
 // options --> for MCQ (not in this release)
-// explantion --> string; ( max 360 char)
+// explanation --> string; ( max 360 char)
 
 // ========================Create========================
 // check if userId is valid
