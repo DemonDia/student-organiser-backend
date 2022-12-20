@@ -9,8 +9,8 @@ const Quiz = require("../Models/quizModel");
 // question --> string; what is the question? (max 130 char)
 // correctAnswer --> string; correct answer for the qn (max 130 char)
 // questionType --> Number
-// 1 is open-ended
-// 2 is mcq
+    // 1 is open-ended
+    // 2 is mcq
 // options --> for MCQ (not in this release)
 // explanation --> string; ( max 360 char)
 
