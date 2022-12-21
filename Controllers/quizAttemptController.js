@@ -203,6 +203,45 @@ const updateQuizAttempt = async (req, res) => {
 const deleteQuizAttempt = async (req, res) => {
     // takes in quizAttemptId (in params)
     // takes in userId (in body)
+    const { quizAttemptId } = req.params;
+    const { userId } = req.body;
+    if (quizAttemptId.length != 24) {
+        res.send({
+            success: false,
+            message: "Quiz attempt does not exist!",
+        });
+    } else {
+        await QuizAttempt.findById(quizAttemptId).then((result) => {
+            if (!result) {
+                res.send({
+                    success: false,
+                    message: "Quiz attempt does not exist!",
+                });
+            } else {
+                if (result.userId != userId) {
+                    res.send({
+                        success: false,
+                        message: "User does not have that quiz attempt",
+                    });
+                } else {
+                    QuizAttempt.deleteOne(result)
+                        .then((deleteResult) => {
+                            res.send({
+                                success: true,
+                                message: "Quiz attempt deleted",
+                            });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            res.send({
+                                success: false,
+                                message: err,
+                            });
+                        });
+                }
+            }
+        });
+    }
 };
 module.exports = {
     addQuizAttempt,
