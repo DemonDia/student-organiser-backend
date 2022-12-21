@@ -194,6 +194,81 @@ const updateQuizAttempt = async (req, res) => {
     // takes in quizAttemptId (in params)
     // takes in userId (in body)
     // takes in questions, attemptStatus, quizScore (in body)
+
+    // change of attemptStatus
+        // 1 to 2 --> nothing
+        // 2 to 3 --> update all qns to marked 
+        // 3 --> readonly; cannot update
+
+    const { userId, questions,quizScore } = req.body;
+    const { quizAttemptId } = req.params;
+    if (quizAttemptId.length != 24) {
+        res.send({
+            success: false,
+            message: "Quiz attempt does not exist",
+        });
+    } else {
+        await QuizAttempt.findById(quizAttemptId).then(async (result) => {
+            if (!result) {
+                res.send({
+                    success: false,
+                    message: "Quiz attempt does not exist!",
+                });
+            } else {
+                if (result.userId != userId) {
+                    res.send({
+                        success: false,
+                        message: "User does not have that quiz attempt",
+                    });
+                }else{
+                    const {attemptStatus} = result
+                    // check attempt status
+                    if(attemptStatus == 3){
+                        res.send({
+                            success: false,
+                            message: "Quiz attempt cannot be modified anymore!",
+                        });
+                    }
+                    else{
+                        if(attemptStatus == 2){
+                            var quizScore = 0;
+                            questions.map((question)=>{
+                                question.isMarked = true
+                                if(question.isCorrect){
+                                    quizScore += 1
+                                }
+                            })
+
+                        }
+                        QuizAttempt.updateOne(
+                            {_id:result._id},
+                            {
+                                questions,
+                                attemptStatus:attemptStatus+1,
+                                quizScore
+                            }
+                        ).then((result) => {
+                            res.send({
+                                success: true,
+                                message: "Quiz attempt updated",
+                            });
+                        }).catch((err) => {
+                            res.send({
+                                success: false,
+                                message: err,
+                            });
+                        });
+                    }
+                }
+            }
+        })
+        
+    }
+
+
+
+
+
 };
 
 // ========================Delete========================
