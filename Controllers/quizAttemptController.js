@@ -1,7 +1,6 @@
 const User = require("../Models/userModel");
 const Quiz = require("../Models/quizModel");
 const QuizAttempt = require("../Models/quizAttemptModel");
-const { findById } = require("../Models/userModel");
 // ========================quiz attempt schema========================
 // userId --> belong to specific user
 // quizName --> name of specific quiz --> taken from quiz template
@@ -72,6 +71,7 @@ const addQuizAttempt = async (req, res) => {
                     userId,
                     quizName,
                     attemptStatus:1,
+                    questions:quizQuestions,
                     noOfQuestions:quizQuestions.length,
                     quizScore:-1,
                     isoDate:currentDate
@@ -98,19 +98,91 @@ const addQuizAttempt = async (req, res) => {
 
 // ========================Read========================
 // =============get all attempts on db=============
-const getQuizAttempts = async (req, res) => {};
+const getQuizAttempts = async (req, res) => {
+    await QuizAttempt.find()
+    .then((result) => {
+        res.send({
+            success: true,
+            data: result,
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+        res.send({
+            success: false,
+            message: err,
+        });
+    });
+};
 
 // =============get all user quiz attempts=============
 // check if userId is valid
 // check for quiz attempts with matching userId
 const getUserQuizAttempts = async (req, res) => {
     // takes in userId (in params)
+    userId = req.params.userId;
+    if (userId.length != 24) {
+        res.send({
+            success: false,
+            message: "User does not exist",
+        });
+    } else {
+        const getUser = await User.findOne({ _id: userId });
+        if (!getUser) {
+            res.send({
+                success: false,
+                message: "User does not exist",
+            });
+        } else {
+            await QuizAttempt.find({ userId: userId })
+                .then((result) => {
+                    res.send({
+                        success: true,
+                        data: result,
+                    });
+                })
+                .catch((err) => {
+                    res.send({
+                        success: false,
+                        message: err,
+                    });
+                });
+        }
+    }
 };
 
 // =============get quiz attempt by Id=============
 // check if quizAttemptId is valid
 const getQuizAttemptById = async (req, res) => {
     // takes in quizAttemptId (in params)
+    const { quizAttemptId } = req.params;
+    if (quizAttemptId.length != 24) {
+        res.send({
+            success: false,
+            message: "Quiz attempt is not found",
+        });
+    } else {
+        await QuizAttempt.findById(quizAttemptId)
+            .then((result) => {
+                if (!result) {
+                    res.send({
+                        success: false,
+                        message: "Quiz attempt is not found",
+                    });
+                } else {
+                    res.send({
+                        success: true,
+                        data: result,
+                    });
+                }
+            })
+            .catch((err) => {
+                res.send({
+                    success: false,
+                    message: err,
+                });
+            });
+    }
 };
 
 // ========================Update========================
