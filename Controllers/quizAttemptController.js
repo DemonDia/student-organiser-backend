@@ -14,8 +14,8 @@ const QuizAttempt = require("../Models/quizAttemptModel");
 // question --> string; what is the question? --> taken from quiz template
 // correctAnswer --> string; correct answer for the qn --> taken from quiz template
 // questionType --> Number --> taken from quiz template
-    // 1 is open-ended
-    // 2 is mcq
+// 1 is open-ended
+// 2 is mcq
 // options --> for MCQ (not in this release)
 // explanation --> string; --> taken from quiz template
 // userAnswer --> string; user's answer
@@ -25,10 +25,10 @@ const QuizAttempt = require("../Models/quizAttemptModel");
 // check if quiz is valid
 // check if userId of user matches the userId of quiz
 // generating the questions in the snapshot
-    // question, correctAnswer, questionType, explanation --> take from question from quiz template
-    // userAnswer --> empty string as default
-    // isMarked --> false as default
-    // isCorrect --> false as default
+// question, correctAnswer, questionType, explanation --> take from question from quiz template
+// userAnswer --> empty string as default
+// isMarked --> false as default
+// isCorrect --> false as default
 // attemptDate and isoDate --> current DateTime which snapshot is created (now)
 // attemptStatus --> 1 as default (incomplete)
 // noOfquestions --> number of questions inside --> default is length of question array
@@ -66,31 +66,31 @@ const addQuizAttempt = async (req, res) => {
                         isCorrect: false,
                     });
                 });
-                currentDate = new Date()
+                currentDate = new Date();
                 const newAttempt = new QuizAttempt({
                     userId,
                     quizName,
-                    attemptStatus:1,
-                    questions:quizQuestions,
-                    noOfQuestions:quizQuestions.length,
-                    quizScore:-1,
-                    isoDate:currentDate
-                })
-                await QuizAttempt.create(newAttempt)
-                .then((result) => {
-                    res.send({
-                        success: true,
-                        message: "Quiz attempt added",
-                        data: newAttempt._id,
-                    });
-                })
-                .catch((err) => {
-                    console.log(err);
-                    res.send({
-                        success: false,
-                        message: err,
-                    });
+                    attemptStatus: 1,
+                    questions: quizQuestions,
+                    noOfQuestions: quizQuestions.length,
+                    quizScore: -1,
+                    isoDate: currentDate,
                 });
+                await QuizAttempt.create(newAttempt)
+                    .then((result) => {
+                        res.send({
+                            success: true,
+                            message: "Quiz attempt added",
+                            data: newAttempt._id,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.send({
+                            success: false,
+                            message: err,
+                        });
+                    });
             }
         }
     }
@@ -100,19 +100,19 @@ const addQuizAttempt = async (req, res) => {
 // =============get all attempts on db=============
 const getQuizAttempts = async (req, res) => {
     await QuizAttempt.find()
-    .then((result) => {
-        res.send({
-            success: true,
-            data: result,
+        .then((result) => {
+            res.send({
+                success: true,
+                data: result,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.send({
+                success: false,
+                message: err,
+            });
         });
-    })
-    .catch((err) => {
-        console.log(err);
-        res.send({
-            success: false,
-            message: err,
-        });
-    });
 };
 
 // =============get all user quiz attempts=============
@@ -196,11 +196,11 @@ const updateQuizAttempt = async (req, res) => {
     // takes in questions, attemptStatus, quizScore (in body)
 
     // change of attemptStatus
-        // 1 to 2 --> nothing
-        // 2 to 3 --> update all qns to marked 
-        // 3 --> readonly; cannot update
+    // 1 to 2 --> nothing
+    // 2 to 3 --> update all qns to marked
+    // 3 --> readonly; cannot update
 
-    const { userId, questions,quizScore } = req.body;
+    const { userId, questions, quizScore, attemptStatus } = req.body;
     const { quizAttemptId } = req.params;
     if (quizAttemptId.length != 24) {
         res.send({
@@ -220,55 +220,41 @@ const updateQuizAttempt = async (req, res) => {
                         success: false,
                         message: "User does not have that quiz attempt",
                     });
-                }else{
-                    const {attemptStatus} = result
+                } else {
                     // check attempt status
-                    if(attemptStatus == 3){
-                        res.send({
-                            success: false,
-                            message: "Quiz attempt cannot be modified anymore!",
+                    if (attemptStatus == 2) {
+                        var quizScore = 0;
+                        questions.map((question) => {
+                            question.isMarked = true;
+                            if (question.isCorrect) {
+                                quizScore += 1;
+                            }
                         });
                     }
-                    else{
-                        if(attemptStatus == 2){
-                            var quizScore = 0;
-                            questions.map((question)=>{
-                                question.isMarked = true
-                                if(question.isCorrect){
-                                    quizScore += 1
-                                }
-                            })
-
+                    QuizAttempt.updateOne(
+                        { _id: result._id },
+                        {
+                            questions,
+                            attemptStatus,
+                            quizScore,
                         }
-                        QuizAttempt.updateOne(
-                            {_id:result._id},
-                            {
-                                questions,
-                                attemptStatus:attemptStatus+1,
-                                quizScore
-                            }
-                        ).then((result) => {
+                    )
+                        .then((result) => {
                             res.send({
                                 success: true,
                                 message: "Quiz attempt updated",
                             });
-                        }).catch((err) => {
+                        })
+                        .catch((err) => {
                             res.send({
                                 success: false,
                                 message: err,
                             });
                         });
-                    }
                 }
             }
-        })
-        
+        });
     }
-
-
-
-
-
 };
 
 // ========================Delete========================
