@@ -21,23 +21,23 @@ const quizAttemptSchema = mongoose.Schema({
             // correctAnswer --> correct answer for the question
             // questionType --> type of question (not in this release; in case its developed further)
     },
-    attemptDate:{
-        type:Object,
-        required:[true,"Please add a date"]
-        // date object as follows: --> for filtering in the organiser
-        // year
-        // month
-        // day
-        // time
+    // attemptDate:{
+    //     type:Object,
+    //     required:[true,"Please add a date"]
+    //     // date object as follows: --> for filtering in the organiser
+    //     // year
+    //     // month
+    //     // day
+    //     // time
 
-        // eg: {
-        //     year:2022,
-        //     month:11,
-        //     day:1,
-        //     hour:
-        //     minute:
-        // }
-    },
+    //     // eg: {
+    //     //     year:2022,
+    //     //     month:11,
+    //     //     day:1,
+    //     //     hour:
+    //     //     minute:
+    //     // }
+    // },
     isoDate:{
         type:Date,
         required:[true,"Please add a date"]
@@ -49,7 +49,7 @@ const quizAttemptSchema = mongoose.Schema({
         // 2 --> marking
         // 3 --> marked (readonly)
     },
-    noOfQuetions:{
+    noOfQuestions:{
         type:Number,
         required:[true,"Please include the number of questions"]
     },
