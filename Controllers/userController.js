@@ -166,16 +166,15 @@ const getMe = async (req, res) => {
             message: "Invalid ID",
         });
     } else {
-        const { _id, username, email, phoneNumber } = await User.findById(
+        const { _id, name, email } = await User.findById(
             req.user.id
         );
         // check token
         res.send({
             success: true,
             id: _id,
-            username,
+            name,
             email,
-            phoneNumber,
         });
     }
 };
