@@ -36,13 +36,6 @@ const verifyToken = async (token) => {
     }
 };
 
-const testRoute = async (req, res) => {
-    res.send({
-        success: true,
-        message: "OK",
-    });
-};
-
 // ========================all users========================
 const getUsers = async (req, res) => {
     await User.find()
@@ -375,7 +368,6 @@ const deleteAccount = async (req, res) => {
 
 module.exports = {
     getUsers,
-    testRoute,
     addUser,
     loginUser,
     getMe,

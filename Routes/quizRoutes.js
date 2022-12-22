@@ -10,7 +10,7 @@ const express = require("express");
 const router = express.Router();
 const { protect } = require("../Middleware/authMiddleware");
 
-router.get("/", getQuizzes);
+// router.get("/", getQuizzes);
 router.get("/id/:quizId", protect, getQuizById);
 router.get("/:userId", protect, getUserQuizzes);
 router.post("/", protect, addQuiz);

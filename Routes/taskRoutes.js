@@ -7,10 +7,11 @@ const {
     updateTaskCompletion,
     deleteTask,
 } = require("../Controllers/taskController");
+
 const express = require("express");
 const router = express.Router();
 const { protect } = require("../Middleware/authMiddleware");
-router.get("/",getTasks);
+// router.get("/",getTasks);
 router.get("/:userId",protect,getAllUserTasks)
 router.get("/:year/:month/:day/:userId",protect,getDayMonthYearUserTasks)
 router.post("/",protect,addTask)

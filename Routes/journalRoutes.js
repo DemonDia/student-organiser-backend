@@ -11,7 +11,7 @@ const express = require("express");
 const router = express.Router();
 const { protect } = require("../Middleware/authMiddleware")
 
-router.get("/", getJournals);
+// router.get("/", getJournals);
 router.get("/id/:journalId", protect, getJournalById);
 router.get("/:userId", protect, getUserJournals);
 router.get("/:year/:month/:day/:userId", protect, getDayMonthYearUserJournals);
