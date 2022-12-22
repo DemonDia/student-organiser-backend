@@ -308,6 +308,35 @@ const changeNewPassword = async (req, res) => {
         }
     }
 };
+// ========================change name========================
+const changeName = async (req, res) => {
+    const {userId,name} = req.body
+    await User.findById(userId).then((result) => {
+        if (!result) {
+            res.send({
+                success: false,
+                message: "User does not exist!",
+            });
+        } else {
+            User.updateOne(
+                { _id: result._id },
+                { name }
+            )
+                .then((result) => {
+                    res.send({
+                        success: true,
+                        message: "Name updated",
+                    });
+                })
+                .catch((err) => {
+                    res.send({
+                        success: false,
+                        message: err,
+                    });
+                });
+        }
+    });
+};
 
 module.exports = {
     getUsers,
@@ -318,4 +347,5 @@ module.exports = {
     verifyUser,
     sendForgetPasswordEmail,
     changeNewPassword,
+    changeName
 };
