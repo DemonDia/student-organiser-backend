@@ -7,7 +7,8 @@ const {
     verifyUser,
     sendForgetPasswordEmail,
     changeNewPassword,
-    changeName
+    changeName,
+    deleteAccount
 } = require("../Controllers/userController");
 
 const express = require("express");
@@ -22,4 +23,5 @@ router.put("/verify/:userId/:token", verifyUser);
 router.put("/resetpass", sendForgetPasswordEmail);
 router.put("/changename",protect,changeName);
 router.post("/changepass",changeNewPassword);
+router.delete("/:userId",protect,deleteAccount);
 module.exports = router;

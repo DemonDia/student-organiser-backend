@@ -1,4 +1,10 @@
 const User = require("../Models/userModel");
+const Event = require("../Models/eventModel");
+const Journal = require("../Models/journalModel");
+const QuizAttempt = require("../Models/quizAttemptModel");
+const Quiz = require("../Models/quizModel");
+const Task = require("../Models/taskModel");
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { sendEmail } = require("../HelperFunctions");
@@ -166,9 +172,7 @@ const getMe = async (req, res) => {
             message: "Invalid ID",
         });
     } else {
-        const { _id, name, email } = await User.findById(
-            req.user.id
-        );
+        const { _id, name, email } = await User.findById(req.user.id);
         // check token
         res.send({
             success: true,
@@ -308,9 +312,10 @@ const changeNewPassword = async (req, res) => {
         }
     }
 };
+
 // ========================change name========================
 const changeName = async (req, res) => {
-    const {userId,name} = req.body
+    const { userId, name } = req.body;
     await User.findById(userId).then((result) => {
         if (!result) {
             res.send({
@@ -318,10 +323,7 @@ const changeName = async (req, res) => {
                 message: "User does not exist!",
             });
         } else {
-            User.updateOne(
-                { _id: result._id },
-                { name }
-            )
+            User.updateOne({ _id: result._id }, { name })
                 .then((result) => {
                     res.send({
                         success: true,
@@ -338,6 +340,39 @@ const changeName = async (req, res) => {
     });
 };
 
+// ========================delete account========================
+const deleteAccount = async (req, res) => {
+    userId = req.params.userId;
+    currUser = await User.findById(userId);
+    if (!currUser) {
+        res.send({
+            success: false,
+            message: "User not found",
+        });
+    } else {
+        await Event.deleteMany({ userId });
+        await Journal.deleteMany({ userId });
+        await QuizAttempt.deleteMany({ userId });
+        await Quiz.deleteMany({ userId });
+        await Task.deleteOne({userId});
+        await User.deleteOne({_id:userId})
+            .then((deleteResult) => {
+                console.log(deleteResult);
+                res.send({
+                    success: true,
+                    message: "User deleted",
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+                res.send({
+                    success: false,
+                    message: err,
+                });
+            });
+    }
+};
+
 module.exports = {
     getUsers,
     testRoute,
@@ -347,5 +382,6 @@ module.exports = {
     verifyUser,
     sendForgetPasswordEmail,
     changeNewPassword,
-    changeName
+    changeName,
+    deleteAccount,
 };
