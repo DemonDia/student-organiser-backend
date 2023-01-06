@@ -8,33 +8,6 @@ const Task = require("../Models/taskModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { sendEmail } = require("../HelperFunctions");
-// ========================JWT========================
-const generateJWT = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: "30d",
-    });
-};
-const verifyToken = async (token) => {
-    if (token) {
-        try {
-            // verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            // get user from token
-            currUser = await User.findById(decoded.id).select("-password");
-            if (currUser) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (err) {
-            console.log(err);
-            return false;
-        }
-    } else {
-        return false;
-    }
-};
 
 // ========================all users========================
 const getUsers = async (req, res) => {
@@ -117,62 +90,59 @@ const addUser = async (req, res) => {
 // ========================login user========================
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
-    if (!email || !password) {
-        res.send({
-            success: false,
-            message: "Please fill up all the fields",
-        });
-    } else {
-        const user = await User.findOne({ email });
-        if (user) {
-            if (!user.activated) {
-                res.send({
-                    success: false,
-                    message: "Pleaase verify your account!",
-                });
-            } else {
-                if (await bcrypt.compare(password, user.password)) {
-                    res.send({
-                        success: true,
-                        message: "Login successful",
-                        token: generateJWT(user._id),
-                    });
-                } else {
-                    res.send({
-                        success: false,
-                        message: "Invalid pasword",
-                    });
-                }
-            }
-        } else {
-            res.send({
-                success: false,
-                message: "Invalid user",
-            });
-        }
+
+    let existingUser;
+    try {
+        existingUser = await User.findOne({ email });
+    } catch (err) {
+        return new Error(err);
     }
+    if (!existingUser) {
+        return res.status(400).json({ message: "User not found." });
+    }
+    // check if password match
+    const isPasswordCorrect = bcrypt.compareSync(
+        password,
+        existingUser.password
+    );
+    if (!isPasswordCorrect) {
+        // if not matched, return error
+        return res.status(400).json({ message: "Incorrect password." });
+    }
+    // if matched, generate jwt & cookies
+    const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+    });
+    console.log("Generated Token\n", token);
+    console.log("req.cookies", req.cookies);
+    // if (req.cookies[`${existingUser._id}`]) {
+    //     req.cookies[`${existingUser._id}`] = "";
+    // }
+
+    res.cookie(String(existingUser._id), token, {
+        path: "/",
+        expires: new Date(Date.now() + 1000 * 60 * 60),
+        httpOnly: true,
+        sameSite: "lax",
+    });
+    return res
+        .status(200)
+        .json({ message: "Logged in", user: existingUser, token });
 };
+
 // ========================get curr user========================
 const getMe = async (req, res) => {
-    if (!req.user) {
-        res.send({
-            success: false,
-            message: "Invalid user",
-        });
-    } else if (req.user.id.length != 24) {
-        res.send({
-            success: false,
-            message: "Invalid ID",
-        });
+    const { id: userId } = req;
+    let existingUser;
+    try {
+        existingUser = await User.findById(userId, "-password");
+    } catch (err) {
+        return new Error(err);
+    }
+    if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
     } else {
-        const { _id, name, email } = await User.findById(req.user.id);
-        // check token
-        res.send({
-            success: true,
-            id: _id,
-            name,
-            email,
-        });
+        return res.status(200).json({ existingUser });
     }
 };
 // ========================verify user========================
@@ -347,8 +317,8 @@ const deleteAccount = async (req, res) => {
         await Journal.deleteMany({ userId });
         await QuizAttempt.deleteMany({ userId });
         await Quiz.deleteMany({ userId });
-        await Task.deleteOne({userId});
-        await User.deleteOne({_id:userId})
+        await Task.deleteOne({ userId });
+        await User.deleteOne({ _id: userId })
             .then((deleteResult) => {
                 console.log(deleteResult);
                 res.send({

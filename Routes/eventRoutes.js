@@ -10,14 +10,14 @@ const {
 } = require("../Controllers/eventController");
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../Middleware/authMiddleware");
+const { verifyToken,refreshToken } = require("../Middleware/authMiddleware");
 
 // router.get("/", getEvents);
-router.get("/id/:eventId", protect, getEventById);
-router.get("/:userId", protect, getAllUserEvents);
-router.get("/:year/:month/:userId", protect, getMonthYearUserEvents);
-router.get("/:year/:month/:day/:userId", protect, getDayMonthYearUserEvents);
-router.post("/", protect, addEvent);
-router.put("/:eventId", protect, updateEvent);
-router.delete("/:eventId", protect, deleteEvent);
+router.get("/id/:eventId", verifyToken, getEventById);
+router.get("/:userId", verifyToken, getAllUserEvents);
+router.get("/:year/:month/:userId", verifyToken, getMonthYearUserEvents);
+router.get("/:year/:month/:day/:userId", verifyToken, getDayMonthYearUserEvents);
+router.post("/", verifyToken, addEvent);
+router.put("/:eventId", verifyToken, updateEvent);
+router.delete("/:eventId", verifyToken, deleteEvent);
 module.exports = router;

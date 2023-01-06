@@ -8,12 +8,12 @@ const {
 } = require("../Controllers/quizController");
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../Middleware/authMiddleware");
+const { verifyToken } = require("../Middleware/authMiddleware");
 
 // router.get("/", getQuizzes);
-router.get("/id/:quizId", protect, getQuizById);
-router.get("/:userId", protect, getUserQuizzes);
-router.post("/", protect, addQuiz);
-router.put("/:quizId", protect, updateQuiz);
-router.delete("/:quizId", protect, deleteQuiz);
+router.get("/id/:quizId", verifyToken, getQuizById);
+router.get("/:userId", verifyToken, getUserQuizzes);
+router.post("/", verifyToken, addQuiz);
+router.put("/:quizId", verifyToken, updateQuiz);
+router.delete("/:quizId", verifyToken, deleteQuiz);
 module.exports = router;
