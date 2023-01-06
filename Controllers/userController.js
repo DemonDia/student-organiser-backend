@@ -141,6 +141,7 @@ const loginUser = async (req, res) => {
         expiresIn: "35s",
     });
 
+    console.log("token", token);
     if (req.headers.cookie) {
         console.log("deleted");
         req.headers.cookie = "";
