@@ -121,44 +121,48 @@ const loginUser = async (req, res) => {
 
     let existingUser;
     try {
-      existingUser = await User.findOne({ email: email });
+        existingUser = await User.findOne({ email: email });
     } catch (err) {
-      return new Error(err);
+        return new Error(err);
     }
     if (!existingUser) {
-      return res.status(400).json({ message: "User not found. Signup Please" });
+        return res
+            .status(400)
+            .json({ message: "User not found. Signup Please" });
     }
-    const isPasswordCorrect = bcrypt.compareSync(password, existingUser.password);
+    const isPasswordCorrect = bcrypt.compareSync(
+        password,
+        existingUser.password
+    );
     if (!isPasswordCorrect) {
-      return res.status(400).json({ message: "Inavlid Email / Password" });
+        return res.status(400).json({ message: "Inavlid Email / Password" });
     }
     const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "35s",
+        expiresIn: "35s",
     });
-  
-    console.log("Generated Token\n", token);
-  
-    // if (req.cookies[`${existingUser._id}`]) {
-    //   req.cookies[`${existingUser._id}`] = "";
-    // }
-  
+
+    if (req.headers.cookie) {
+        console.log("deleted");
+        req.headers.cookie = "";
+    }
+
     res.cookie(String(existingUser._id), token, {
-      path: "/",
-      expires: new Date(Date.now() + 1000 * 30), // 30 seconds
-      httpOnly: true,
-      sameSite: "lax",
+        path: "/",
+        expires: new Date(Date.now() + 1000 * 30), // 30 seconds
+        httpOnly: true,
+        sameSite: "lax",
     });
-  
+
     return res
-      .status(200)
-      .json({ message: "Successfully Logged In", user: existingUser, token });
+        .status(200)
+        .json({ message: "Successfully Logged In", user: existingUser, token });
 };
 
 // ========================logout user========================
 const logoutUser = async (req, res, next) => {
     const cookies = req.headers.cookie;
-    console.log(cookies);
-    const prevToken = cookies.split("=")[1];
+    const rawToken = cookies.split("=")[1];
+    const prevToken = rawToken.split("; ")[0];
     if (!prevToken) {
         return res.status(400).json({ message: "Couldn't find token" });
     }

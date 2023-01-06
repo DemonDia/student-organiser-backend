@@ -1,7 +1,12 @@
 const jwt = require("jsonwebtoken");
 const verifyToken = (req, res, next) => {
     const cookies = req.headers.cookie;
-    const token = cookies.split("=")[1];
+    const rawToken = cookies.split("=")[1];
+    console.log("verify rawToken\n",rawToken)
+    console.log("verify rawToken length\n", rawToken.length);
+    const token = rawToken.split("; ")[0];
+    console.log("verify token\n",token)
+    console.log("verify token length\n", token.length);
     if (!token) {
         return res.status(404).json({ message: "No token found" });
     }
@@ -17,7 +22,8 @@ const verifyToken = (req, res, next) => {
 };
 const refreshToken = (req, res, next) => {
     const cookies = req.headers.cookie;
-    const prevToken = cookies.split("=")[1];
+    const rawToken = cookies.split("=")[1];
+    const prevToken = rawToken.split("; ")[0];
     if (!prevToken) {
         return res.status(400).json({ message: "Couldn't find token" });
     }
