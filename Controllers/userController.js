@@ -8,10 +8,11 @@ const Task = require("../Models/taskModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { sendEmail } = require("../HelperFunctions");
+
 // ========================JWT========================
 const generateJWT = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: "30d",
+        expiresIn: 5 * 60,
     });
 };
 const verifyToken = async (token) => {
@@ -117,62 +118,78 @@ const addUser = async (req, res) => {
 // ========================login user========================
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
-    if (!email || !password) {
-        res.send({
-            success: false,
-            message: "Please fill up all the fields",
-        });
-    } else {
-        const user = await User.findOne({ email });
-        if (user) {
-            if (!user.activated) {
-                res.send({
-                    success: false,
-                    message: "Pleaase verify your account!",
-                });
-            } else {
-                if (await bcrypt.compare(password, user.password)) {
-                    res.send({
-                        success: true,
-                        message: "Login successful",
-                        token: generateJWT(user._id),
-                    });
-                } else {
-                    res.send({
-                        success: false,
-                        message: "Invalid pasword",
-                    });
-                }
-            }
-        } else {
-            res.send({
-                success: false,
-                message: "Invalid user",
-            });
-        }
+
+    let existingUser;
+    try {
+        existingUser = await User.findOne({ email: email });
+    } catch (err) {
+        return new Error(err);
     }
+    if (!existingUser) {
+        return res
+            .status(400)
+            .json({ message: "User not found. Signup Please" });
+    }
+    const isPasswordCorrect = bcrypt.compareSync(
+        password,
+        existingUser.password
+    );
+    if (!isPasswordCorrect) {
+        return res.status(400).json({ message: "Inavlid Email / Password" });
+    }
+    const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
+        expiresIn: "35s",
+    });
+
+    if (req.headers.cookie) {
+        console.log("deleted");
+        req.headers.cookie = "";
+    }
+
+    res.cookie(String(existingUser._id), token, {
+        path: "/",
+        expires: new Date(Date.now() + 1000 * 30), // 30 seconds
+        httpOnly: true,
+        sameSite: "lax",
+    });
+
+    return res
+        .status(200)
+        .json({ message: "Successfully Logged In", user: existingUser, token });
 };
+
+// ========================logout user========================
+const logoutUser = async (req, res, next) => {
+    const cookies = req.headers.cookie;
+    const rawToken = cookies.split("=")[1];
+    const prevToken = rawToken.split("; ")[0];
+    if (!prevToken) {
+        return res.status(400).json({ message: "Couldn't find token" });
+    }
+    jwt.verify(String(prevToken), process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            console.log(err);
+            return res.status(403).json({ message: "Authentication failed" });
+        }
+        res.clearCookie(`${user.id}`);
+        // req.cookies[`${user.id}`] = "";
+        return res.status(200).json({ message: "Logged out" });
+    });
+};
+
 // ========================get curr user========================
 const getMe = async (req, res) => {
-    if (!req.user) {
-        res.send({
-            success: false,
-            message: "Invalid user",
-        });
-    } else if (req.user.id.length != 24) {
-        res.send({
-            success: false,
-            message: "Invalid ID",
-        });
+    const { id: userId } = req;
+    let existingUser;
+    try {
+        existingUser = await User.findById(userId, "-password");
+    } catch (err) {
+        return new Error(err);
+    }
+    if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
     } else {
-        const { _id, name, email } = await User.findById(req.user.id);
-        // check token
-        res.send({
-            success: true,
-            id: _id,
-            name,
-            email,
-        });
+        return res.status(200).json({ existingUser });
     }
 };
 // ========================verify user========================
@@ -228,7 +245,6 @@ const sendForgetPasswordEmail = async (req, res) => {
                         token: token,
                         recipient: result.email,
                     };
-                    console.log("user", result);
                     await sendEmail("forgotPassword", content)
                         .then((result) => {
                             res.send({
@@ -347,10 +363,9 @@ const deleteAccount = async (req, res) => {
         await Journal.deleteMany({ userId });
         await QuizAttempt.deleteMany({ userId });
         await Quiz.deleteMany({ userId });
-        await Task.deleteOne({userId});
-        await User.deleteOne({_id:userId})
+        await Task.deleteOne({ userId });
+        await User.deleteOne({ _id: userId })
             .then((deleteResult) => {
-                console.log(deleteResult);
                 res.send({
                     success: true,
                     message: "User deleted",
@@ -370,6 +385,7 @@ module.exports = {
     getUsers,
     addUser,
     loginUser,
+    logoutUser,
     getMe,
     verifyUser,
     sendForgetPasswordEmail,

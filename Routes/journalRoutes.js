@@ -9,13 +9,13 @@ const {
 } = require("../Controllers/journalController");
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../Middleware/authMiddleware")
+const { verifyToken } = require("../Middleware/authMiddleware")
 
 // router.get("/", getJournals);
-router.get("/id/:journalId", protect, getJournalById);
-router.get("/:userId", protect, getUserJournals);
-router.get("/:year/:month/:day/:userId", protect, getDayMonthYearUserJournals);
-router.post("/", protect, addJournal);
-router.put("/:journalId", protect, updateJournal);
-router.delete("/:journalId", protect, deleteJournal);
+router.get("/id/:journalId", verifyToken, getJournalById);
+router.get("/:userId", verifyToken, getUserJournals);
+router.get("/:year/:month/:day/:userId", verifyToken, getDayMonthYearUserJournals);
+router.post("/", verifyToken, addJournal);
+router.put("/:journalId", verifyToken, updateJournal);
+router.delete("/:journalId", verifyToken, deleteJournal);
 module.exports = router;

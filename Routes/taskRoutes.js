@@ -10,12 +10,12 @@ const {
 
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../Middleware/authMiddleware");
+const { verifyToken } = require("../Middleware/authMiddleware");
 // router.get("/",getTasks);
-router.get("/:userId",protect,getAllUserTasks)
-router.get("/:year/:month/:day/:userId",protect,getDayMonthYearUserTasks)
-router.post("/",protect,addTask)
-router.put("/:taskId", protect, updateTask);
-router.put("/completion/:taskId", protect, updateTaskCompletion);
-router.delete("/:taskId", protect, deleteTask);
+router.get("/:userId",verifyToken,getAllUserTasks)
+router.get("/:year/:month/:day/:userId",verifyToken,getDayMonthYearUserTasks)
+router.post("/",verifyToken,addTask)
+router.put("/:taskId", verifyToken, updateTask);
+router.put("/completion/:taskId", verifyToken, updateTaskCompletion);
+router.delete("/:taskId", verifyToken, deleteTask);
 module.exports = router;
