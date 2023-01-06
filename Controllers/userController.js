@@ -121,41 +121,37 @@ const loginUser = async (req, res) => {
 
     let existingUser;
     try {
-        existingUser = await User.findOne({ email });
+      existingUser = await User.findOne({ email: email });
     } catch (err) {
-        return new Error(err);
+      return new Error(err);
     }
     if (!existingUser) {
-        return res.status(400).json({ message: "User not found." });
+      return res.status(400).json({ message: "User not found. Signup Please" });
     }
-    // check if password match
-    const isPasswordCorrect = bcrypt.compareSync(
-        password,
-        existingUser.password
-    );
+    const isPasswordCorrect = bcrypt.compareSync(password, existingUser.password);
     if (!isPasswordCorrect) {
-        // if not matched, return error
-        return res.status(400).json({ message: "Incorrect password." });
+      return res.status(400).json({ message: "Inavlid Email / Password" });
     }
-    // if matched, generate jwt & cookies
     const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
+      expiresIn: "35s",
     });
+  
     console.log("Generated Token\n", token);
-    console.log("req.cookies", req.cookies);
+  
     // if (req.cookies[`${existingUser._id}`]) {
-    //     req.cookies[`${existingUser._id}`] = "";
+    //   req.cookies[`${existingUser._id}`] = "";
     // }
-
+  
     res.cookie(String(existingUser._id), token, {
-        path: "/",
-        expires: new Date(Date.now() + 1000 * 60 * 60),
-        httpOnly: true,
-        sameSite: "lax",
+      path: "/",
+      expires: new Date(Date.now() + 1000 * 30), // 30 seconds
+      httpOnly: true,
+      sameSite: "lax",
     });
+  
     return res
-        .status(200)
-        .json({ message: "Logged in", user: existingUser, token });
+      .status(200)
+      .json({ message: "Successfully Logged In", user: existingUser, token });
 };
 
 // ========================logout user========================
