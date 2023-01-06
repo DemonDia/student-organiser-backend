@@ -130,6 +130,25 @@ const loginUser = async (req, res) => {
         .json({ message: "Logged in", user: existingUser, token });
 };
 
+// ========================logout user========================
+const logoutUser = async (req, res,next) => {
+    const cookies = req.headers.cookie;
+    console.log(cookies);
+    const prevToken = cookies.split("=")[1];
+    if (!prevToken) {
+        return res.status(400).json({ message: "Couldn't find token" });
+    }
+    jwt.verify(String(prevToken), process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            console.log(err);
+            return res.status(403).json({ message: "Authentication failed" });
+        }
+        res.clearCookie(`${user.id}`);
+        // req.cookies[`${user.id}`] = "";
+        return res.status(200).json({ message: "Logged out" });
+    });
+};
+
 // ========================get curr user========================
 const getMe = async (req, res) => {
     const { id: userId } = req;
@@ -340,6 +359,7 @@ module.exports = {
     getUsers,
     addUser,
     loginUser,
+    logoutUser,
     getMe,
     verifyUser,
     sendForgetPasswordEmail,

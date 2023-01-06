@@ -2,6 +2,7 @@ const {
     getUsers,
     addUser,
     loginUser,
+    logoutUser,
     getMe,
     verifyUser,
     sendForgetPasswordEmail,
@@ -16,6 +17,7 @@ const { verifyToken, refreshToken } = require("../Middleware/authMiddleware");
 // router.get("/", getUsers);
 router.post("/", addUser);
 router.post("/login", loginUser);
+router.post("/logout", verifyToken, logoutUser);
 router.get("/me", verifyToken, getMe);
 router.put("/verify/:userId/:token", verifyUser);
 router.put("/resetpass", sendForgetPasswordEmail);
