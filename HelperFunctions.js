@@ -7,7 +7,6 @@ let transporter = nodemailer.createTransport({
     },
 });
 const sendEmail = async (emailType, content) => {
-    console.log(content)
     const { user, token,recipient } = content;
     const { _id, name } = user;
     // content contains the following:

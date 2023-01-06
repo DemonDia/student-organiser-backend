@@ -245,7 +245,6 @@ const sendForgetPasswordEmail = async (req, res) => {
                         token: token,
                         recipient: result.email,
                     };
-                    console.log("user", result);
                     await sendEmail("forgotPassword", content)
                         .then((result) => {
                             res.send({
@@ -367,7 +366,6 @@ const deleteAccount = async (req, res) => {
         await Task.deleteOne({ userId });
         await User.deleteOne({ _id: userId })
             .then((deleteResult) => {
-                console.log(deleteResult);
                 res.send({
                     success: true,
                     message: "User deleted",

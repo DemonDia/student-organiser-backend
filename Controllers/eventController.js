@@ -109,7 +109,6 @@ const getMonthYearUserEvents = async (req, res) => {
                     result.forEach((userEvent) => {
                         const { year: eventYear, month: eventMonth } =
                             userEvent.date;
-                        // console.log(eventYear, eventMonth);
                         if (
                             eventYear == filterYear &&
                             eventMonth == filterMonth
