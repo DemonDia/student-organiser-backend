@@ -9,34 +9,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { sendEmail } = require("../HelperFunctions");
 
-// ========================JWT========================
-const generateJWT = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: 5 * 60,
-    });
-};
-const verifyToken = async (token) => {
-    if (token) {
-        try {
-            // verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            // get user from token
-            currUser = await User.findById(decoded.id).select("-password");
-            if (currUser) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (err) {
-            console.log(err);
-            return false;
-        }
-    } else {
-        return false;
-    }
-};
-
 // ========================all users========================
 const getUsers = async (req, res) => {
     await User.find()
@@ -159,7 +131,7 @@ const loginUser = async (req, res) => {
 };
 
 // ========================logout user========================
-const logoutUser = async (req, res, next) => {
+const logoutUser = async (req, res,next) => {
     const cookies = req.headers.cookie;
     console.log(cookies);
     const prevToken = cookies.split("=")[1];
