@@ -3,10 +3,11 @@ const verifyToken = (req, res, next) => {
     console.log("Verify token \n")
     const cookies = req.headers.cookie;
     console.log(req.headers)
-    const rawToken = cookies.split("=")[1];
-    console.log("verify rawToken\n",rawToken)
-    console.log("verify rawToken length\n", rawToken.length);
-    const token = rawToken.split("; ")[0];
+    // const rawToken = cookies.split("=")[1];
+    // console.log("verify rawToken\n",rawToken)
+    // console.log("verify rawToken length\n", rawToken.length);
+    // const token = rawToken.split("; ")[0];
+    const token = cookies.split("=")[1];
     console.log("verify token\n",token)
     console.log("verify token length\n", token.length);
     if (!token) {
@@ -26,10 +27,12 @@ const refreshToken = (req, res, next) => {
     console.log("Refresh token \n")
     const cookies = req.headers.cookie;
     console.log(req.headers)
-    const rawToken = cookies.split("=")[1];
-    console.log("verify rawToken\n",rawToken)
-    console.log("verify rawToken length\n", rawToken.length);
-    const prevToken = rawToken.split("; ")[0];
+    // const rawToken = cookies.split("=")[1];
+    // console.log("verify rawToken\n",rawToken)
+    // console.log("verify rawToken length\n", rawToken.length);
+    // const prevToken = rawToken.split("; ")[0];
+
+    const prevToken = cookies.split("=")[1];
     console.log("verify token\n",prevToken)
     console.log("verify token length\n", prevToken.length);
     if (!prevToken) {
