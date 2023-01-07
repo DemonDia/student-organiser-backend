@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const verifyToken = (req, res, next) => {
     console.log("Verify token \n")
     const cookies = req.headers.cookie;
-    console.log(req.headers)
+    // console.log(req.headers)
     // const rawToken = cookies.split("=")[1];
     // console.log("verify rawToken\n",rawToken)
     // console.log("verify rawToken length\n", rawToken.length);
@@ -26,7 +26,7 @@ const verifyToken = (req, res, next) => {
 const refreshToken = (req, res, next) => {
     console.log("Refresh token \n")
     const cookies = req.headers.cookie;
-    console.log(req.headers)
+    // console.log(req.headers)
     // const rawToken = cookies.split("=")[1];
     // console.log("verify rawToken\n",rawToken)
     // console.log("verify rawToken length\n", rawToken.length);
@@ -45,8 +45,8 @@ const refreshToken = (req, res, next) => {
         }
         // res.clearCookie(`${user.id}`);
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-            expiresIn: "1h",
+        const newToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+            expiresIn: "35s",
         });
         res.cookie(String(user.id), prevToken, {
             path: "/",
@@ -56,7 +56,7 @@ const refreshToken = (req, res, next) => {
             secure: true,
         });
 
-        res.cookie(String(user.id), token, {
+        res.cookie(String(user.id), newToken, {
             path: "/",
             expires: new Date(Date.now() + 1000 * 30), // 30 seconds
             httpOnly: true,
