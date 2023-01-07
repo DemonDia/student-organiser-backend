@@ -149,10 +149,10 @@ const loginUser = async (req, res) => {
 
     res.cookie(String(existingUser._id), token, {
         path: "/",
-        expires: new Date(Date.now() + 1000 * 30), // 
+        expires: new Date(Date.now() + 1000 * 30), //
         httpOnly: true,
         sameSite: "none",
-        secure: true
+        secure: true,
     });
 
     return res
@@ -173,7 +173,14 @@ const logoutUser = async (req, res, next) => {
             console.log(err);
             return res.status(403).json({ message: "Authentication failed" });
         }
-        res.clearCookie(`${user.id}`);
+        // res.clearCookie(`${user.id}`);
+        res.cookie(String(user.id), prevToken, {
+            path: "/",
+            expires: new Date(0), //
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+        });
         // req.cookies[`${user.id}`] = "";
         return res.status(200).json({ message: "Logged out" });
     });
