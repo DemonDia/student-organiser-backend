@@ -49,6 +49,7 @@ const refreshToken = (req, res, next) => {
         httpOnly: true,
         sameSite: "none",
         secure: true,
+        overwrite: true,
     });
 
     req.id = user.id;

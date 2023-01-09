@@ -148,6 +148,7 @@ const loginUser = async (req, res) => {
         httpOnly: true,
         sameSite: "none",
         secure: true,
+        overwrite: true
     });
 
     return res
