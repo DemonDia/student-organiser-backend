@@ -137,18 +137,22 @@ const loginUser = async (req, res) => {
     if (!isPasswordCorrect) {
         return res.status(400).json({ message: "Inavlid Email / Password" });
     }
+
+    if (req.cookies[`${existingUser._id}`]) {
+        req.cookies[`${existingUser._id}`] = "";
+    }
+
     const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
         expiresIn: "35s",
     });
 
-
     res.cookie(String(existingUser._id), token, {
         path: "/",
-        expires: new Date(Date.now() + 1000 * 30),
+        expires: new Date(Date.now() + 1000 * 35),
         httpOnly: true,
         sameSite: "none",
         secure: true,
-        overwrite: true
+        overwrite: true,
     });
 
     return res
