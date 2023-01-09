@@ -57,9 +57,10 @@ const refreshToken = (req, res, next) => {
             path: "/",
             expires: new Date(Date.now() + 1000 * 60), // 60 seconds
             httpOnly: false,
-            sameSite: "lax",
+            sameSite: "none",
             secure: true
         });
+        
 
         req.id = user.id;
         next();

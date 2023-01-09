@@ -158,8 +158,8 @@ const loginUser = async (req, res) => {
 // ========================logout user========================
 const logoutUser = async (req, res, next) => {
     const cookies = req.headers.cookie;
-    const rawToken = cookies.split("=")[1];
-    const prevToken = rawToken.split("; ")[0];
+    const prevToken = cookies.split("=")[1];
+    // const prevToken = rawToken.split("; ")[0];
     if (!prevToken) {
         return res.status(400).json({ message: "Couldn't find token" });
     }
@@ -173,7 +173,7 @@ const logoutUser = async (req, res, next) => {
             path: "/",
             expires: new Date(0),
             httpOnly: false,
-            sameSite: "lax",
+            sameSite: "none",
             secure: true,
         });
         // req.cookies[`${user.id}`] = "";
