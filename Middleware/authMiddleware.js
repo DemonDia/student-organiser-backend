@@ -44,10 +44,11 @@ const refreshToken = (req, res, next) => {
     console.log("Regenerated Token\n", token);
 
     res.cookie(String(user.id), token, {
-      path: "/",
-      expires: new Date(Date.now() + 1000 * 30), // 30 seconds
-      httpOnly: true,
-      sameSite: "lax",
+        path: "/",
+        expires: new Date(Date.now() + 1000 * 60), // 60s
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
     });
 
     req.id = user.id;
