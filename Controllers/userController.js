@@ -173,7 +173,7 @@ const logoutUser = async (req, res, next) => {
             path: "/",
             expires: new Date(0),
             httpOnly: false,
-            sameSite: "none",
+            sameSite: "lax",
             secure: true,
         });
         // req.cookies[`${user.id}`] = "";
