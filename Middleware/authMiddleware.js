@@ -48,7 +48,7 @@ const refreshToken = (req, res, next) => {
         // res.clearCookie(`${user.id}`);
         res.clearCookie(`${user.id}`);
         req.cookies[`${user.id}`] = "";
-        
+
         const newToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
             expiresIn: "60s",
         });
@@ -57,7 +57,7 @@ const refreshToken = (req, res, next) => {
             path: "/",
             expires: new Date(Date.now() + 1000 * 60), // 60 seconds
             httpOnly: false,
-            sameSite: "none",
+            sameSite: "lax",
             secure: true
         });
 
