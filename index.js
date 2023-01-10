@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser')
 
 app.use(cookieParser());
 app.use(express.json())
-app.use(cors({ credentials: "include", origin: process.env.USER_INTERFACE
+app.use(cors({ credentials: true, origin: process.env.USER_INTERFACE
     //  , exposedHeaders: ["set-cookie"]
 }));
 const {connect} = require("./database")

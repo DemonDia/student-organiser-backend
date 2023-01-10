@@ -150,10 +150,9 @@ const loginUser = async (req, res) => {
         path: "/",
         expires: new Date(Date.now() + 1000 * 35),
         // httpOnly: true,
-        sameSite: "None",
+        sameSite: "none",
         secure: true,
         overwrite: true,
-        domain:process.env.USER_INTERFACE
     });
 
     return res
@@ -178,10 +177,9 @@ const logoutUser = async (req, res, next) => {
         res.cookie(String(user.id), prevToken, {
             path: "/",
             expires: new Date(0),
-            httpOnly: false,
-            sameSite: "None",
+            httpOnly: true,
+            sameSite: "none",
             secure: true,
-            domain:process.env.USER_INTERFACE
         });
         // req.cookies[`${user.id}`] = "";
         return res.status(200).json({ message: "Logged out" });
