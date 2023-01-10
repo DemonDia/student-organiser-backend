@@ -175,7 +175,7 @@ const logoutUser = async (req, res, next) => {
         }
         // res.clearCookie(`${user.id}`);
         res.cookie(String(user.id), prevToken, {
-            path: "/",
+            // path: "/",
             expires: new Date(0),
             httpOnly: true,
             sameSite: "none",

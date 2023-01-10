@@ -45,7 +45,7 @@ const refreshToken = (req, res, next) => {
     console.log("Regenerated Token\n", token);
 
     res.cookie(String(user.id), token, {
-        path: "/",
+        // path: "/",
         expires: new Date(Date.now() + 1000 * 35),
         httpOnly: true,
         sameSite: "none",
