@@ -49,9 +49,9 @@ const refreshToken = (req, res, next) => {
             maxAge: 350000,
             // expires: new Date(Date.now() + 1000 * 35),
             httpOnly: true,
-            sameSite: "none",
-            secure: true,
-            overwrite: true,
+            // sameSite: "none",
+            // secure: true,
+            // overwrite: true,
         });
 
         req.id = user.id;
