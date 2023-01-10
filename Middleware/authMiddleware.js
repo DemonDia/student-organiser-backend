@@ -47,7 +47,7 @@ const refreshToken = (req, res, next) => {
     res.cookie(String(user.id), token, {
         path: "/",
         expires: new Date(Date.now() + 1000 * 35),
-        // httpOnly: true,
+        httpOnly: true,
         sameSite: "none",
         secure: true,
         overwrite: true
