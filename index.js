@@ -4,6 +4,7 @@ require("dotenv").config();
 const app = express()
 const cookieParser = require('cookie-parser')
 
+app.set("trust proxy", 1);
 app.use(cookieParser());
 app.use(express.json())
 app.use(cors({ credentials: true, origin: process.env.USER_INTERFACE
