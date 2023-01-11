@@ -154,12 +154,12 @@ const loginUser = async (req, res) => {
     //     sameSite: "none",
     //     secure: true,
     // });
-
+    console.log("domain: process.env.DOMAIN,",domain: process.env.DOMAIN)
     return res
         .status(200)
         .cookie(String(existingUser._id), token, {
             path: "/",
-            // domain: process.env.DOMAIN,
+            domain: process.env.DOMAIN,
             expires: new Date(Date.now() + 1000 * 30),
             httpOnly: true,
             sameSite: "none",
