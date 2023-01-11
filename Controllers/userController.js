@@ -148,12 +148,10 @@ const loginUser = async (req, res) => {
 
     res.cookie(String(existingUser._id), token, {
         path: "/",
-        maxAge: 350000 ,
-        // expires: new Date(Date.now() + 1000 * 35),
+        expires: new Date(Date.now() + 1000 * 30),
         httpOnly: true,
         sameSite: "none",
         secure: true,
-        overwrite: true,
     });
 
     return res

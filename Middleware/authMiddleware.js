@@ -36,8 +36,8 @@ const refreshToken = (req, res, next) => {
             return res.status(403).json({ message: "Authentication failed" });
         }
 
-        // res.clearCookie(`${user.id}`);
-        // req.cookies[`${user.id}`] = "";
+        res.clearCookie(`${user.id}`);
+        req.cookies[`${user.id}`] = "";
 
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
             expiresIn: "35s",
@@ -45,13 +45,11 @@ const refreshToken = (req, res, next) => {
         console.log("Regenerated Token\n", token);
 
         res.cookie(String(user.id), token, {
-            // path: "/",
-            maxAge: 350000,
-            // expires: new Date(Date.now() + 1000 * 35),
+            path: "/",
+            expires: new Date(Date.now() + 1000 * 30),
             httpOnly: true,
             sameSite: "none",
             secure: true,
-            overwrite: true,
         });
 
         req.id = user.id;
