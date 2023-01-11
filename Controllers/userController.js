@@ -154,17 +154,16 @@ const loginUser = async (req, res) => {
     //     sameSite: "none",
     //     secure: true,
     // });
-    console.log("domain: process.env.DOMAIN,",process.env.DOMAIN)
-    res.header('Access-Control-Allow-Credentials', true)
+    console.log("domain: process.env.DOMAIN,", process.env.DOMAIN);
     return res
         .status(200)
-        .cookie(String(existingUser._id), token, {
-            path: "/",
-            expires: new Date(Date.now() + 1000 * 30),
-            httpOnly: true,
-            sameSite: "none",
-            secure: true,
-        })
+        // .cookie(String(existingUser._id), token, {
+        //     path: "/",
+        //     expires: new Date(Date.now() + 1000 * 30),
+        //     httpOnly: false,
+        //     sameSite: "none",
+        //     secure: true,
+        // })
         .json({ message: "Successfully Logged In", user: existingUser, token });
 };
 
@@ -184,8 +183,9 @@ const logoutUser = async (req, res, next) => {
         // res.clearCookie(`${user.id}`);
         res.cookie(String(user.id), prevToken, {
             // path: "/",
+            domain: process.env.DOMAIN,
             expires: new Date(0),
-            httpOnly: true,
+            httpOnly: false,
             sameSite: "none",
             secure: true,
         });
