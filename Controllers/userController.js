@@ -155,16 +155,22 @@ const loginUser = async (req, res) => {
     //     secure: true,
     // });
     console.log("domain: process.env.DOMAIN,", process.env.DOMAIN);
-    return res
-        .status(200)
-        // .cookie(String(existingUser._id), token, {
-        //     path: "/",
-        //     expires: new Date(Date.now() + 1000 * 30),
-        //     httpOnly: false,
-        //     sameSite: "none",
-        //     secure: true,
-        // })
-        .json({ message: "Successfully Logged In", user: existingUser, token });
+    return (
+        res
+            .status(200)
+            // .cookie(String(existingUser._id), token, {
+            //     path: "/",
+            //     expires: new Date(Date.now() + 1000 * 30),
+            //     httpOnly: false,
+            //     sameSite: "none",
+            //     secure: true,
+            // })
+            .json({
+                message: "Successfully Logged In",
+                user: existingUser,
+                token,
+            })
+    );
 };
 
 // ========================logout user========================
@@ -196,7 +202,7 @@ const logoutUser = async (req, res, next) => {
 
 // ========================get curr user========================
 const getMe = async (req, res) => {
-    const { id: userId } = req;
+    const { id: userId, token } = req;
     let existingUser;
     try {
         existingUser = await User.findById(userId, "-password");
@@ -206,7 +212,9 @@ const getMe = async (req, res) => {
     if (!existingUser) {
         return res.status(404).json({ message: "User not found" });
     } else {
-        return res.status(200).json({ existingUser });
+        return res
+            .status(200)
+            .json({ existingUser, token: token ? token : null });
     }
 };
 // ========================verify user========================
