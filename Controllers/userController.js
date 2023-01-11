@@ -154,7 +154,7 @@ const loginUser = async (req, res) => {
     //     sameSite: "none",
     //     secure: true,
     // });
-    console.log("domain: process.env.DOMAIN,",domain: process.env.DOMAIN)
+    console.log("domain: process.env.DOMAIN,",process.env.DOMAIN)
     return res
         .status(200)
         .cookie(String(existingUser._id), token, {
