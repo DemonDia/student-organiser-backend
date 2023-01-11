@@ -146,16 +146,25 @@ const loginUser = async (req, res) => {
         expiresIn: "35s",
     });
 
-    res.cookie(String(existingUser._id), token, {
-        path: "/",
-        expires: new Date(Date.now() + 1000 * 30),
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
-    });
+    // res.cookie(String(existingUser._id), token, {
+    //     path: "/",
+    //     // domain: process.env.DOMAIN,
+    //     expires: new Date(Date.now() + 1000 * 30),
+    //     httpOnly: true,
+    //     sameSite: "none",
+    //     secure: true,
+    // });
 
     return res
         .status(200)
+        .cookie(String(existingUser._id), token, {
+            path: "/",
+            // domain: process.env.DOMAIN,
+            expires: new Date(Date.now() + 1000 * 30),
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+        })
         .json({ message: "Successfully Logged In", user: existingUser, token });
 };
 
