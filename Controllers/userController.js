@@ -155,6 +155,7 @@ const loginUser = async (req, res) => {
     //     secure: true,
     // });
     console.log("domain: process.env.DOMAIN,",process.env.DOMAIN)
+    res.header('Access-Control-Allow-Credentials', true)
     return res
         .status(200)
         .cookie(String(existingUser._id), token, {
