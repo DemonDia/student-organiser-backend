@@ -1,14 +1,8 @@
 const jwt = require("jsonwebtoken");
 const verifyToken = (req, res, next) => {
     console.log("Verify token \n");
-    console.log("header:",req.headers)
     const cookies = req.headers.cookie;
     console.log("cookies", cookies);
-    // console.log(req.headers)
-    // const rawToken = cookies.split("=")[1];
-    // console.log("verify rawToken\n",rawToken)
-    // console.log("verify rawToken length\n", rawToken.length);
-    // const token = rawToken.split("; ")[0];
     const token = cookies.split("=")[1];
     console.log("verify token\n", token);
     console.log("verify token length\n", token.length);
@@ -44,14 +38,6 @@ const refreshToken = (req, res, next) => {
             expiresIn: "35s",
         });
         console.log("Regenerated Token\n", token);
-
-        res.cookie(String(user.id), token, {
-            path: "/",
-            expires: new Date(Date.now() + 1000 * 30),
-            httpOnly: true,
-            sameSite: "none",
-            secure: true,
-        });
         req.token = token;
         req.id = user.id;
         next();

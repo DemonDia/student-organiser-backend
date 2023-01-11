@@ -145,26 +145,9 @@ const loginUser = async (req, res) => {
     const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
         expiresIn: "35s",
     });
-
-    // res.cookie(String(existingUser._id), token, {
-    //     path: "/",
-    //     // domain: process.env.DOMAIN,
-    //     expires: new Date(Date.now() + 1000 * 30),
-    //     httpOnly: true,
-    //     sameSite: "none",
-    //     secure: true,
-    // });
-    console.log("domain: process.env.DOMAIN,", process.env.DOMAIN);
     return (
         res
             .status(200)
-            // .cookie(String(existingUser._id), token, {
-            //     path: "/",
-            //     expires: new Date(Date.now() + 1000 * 30),
-            //     httpOnly: false,
-            //     sameSite: "none",
-            //     secure: true,
-            // })
             .json({
                 message: "Successfully Logged In",
                 user: existingUser,
@@ -187,7 +170,7 @@ const logoutUser = async (req, res, next) => {
             return res.status(403).json({ message: "Authentication failed" });
         }
         // res.clearCookie(`${user.id}`);
-        res.cookie(String(user.id), prevToken, {
+        res.cookie("currUser", prevToken, {
             // path: "/",
             domain: process.env.DOMAIN,
             expires: new Date(0),
